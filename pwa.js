@@ -1,18 +1,29 @@
-// BDC Vault PWA & App Store Style Update Engine
+// BDC Vault PWA & wosBDC Style Live App Update Alert Engine
 (function() {
-  const CURRENT_VERSION = "v4.7.1";
-  const RELEASE_DATE = "September 2, 2026";
-  const WHATS_NEW = [
-    "Removed subtitle from main navigation banner for clean luxury aesthetic.",
-    "Updated version badge display to v4.7.1.",
-    "Streamlined navbar branding across desktop and mobile."
-  ];
-
-  let waitingWorker = null;
-  let refreshing = false;
+  const CURRENT_BUILD_VERSION = "4.7.2";
   let deferredPrompt = null;
 
-  // 1. Check if running as Installed Standalone App
+  // 1. Version Comparison Logic (from wosBDC)
+  function isVersionOutdated(localVer, remoteVer) {
+    if (!remoteVer || !localVer) return false;
+    const cleanL = String(localVer).replace(/^v/, '').trim();
+    const cleanR = String(remoteVer).replace(/^v/, '').trim();
+    if (cleanL === cleanR) return false;
+
+    const v1 = cleanL.split('.').map(n => parseInt(n, 10) || 0);
+    const v2 = cleanR.split('.').map(n => parseInt(n, 10) || 0);
+    const len = Math.max(v1.length, v2.length);
+
+    for (let i = 0; i < len; i++) {
+      const s = v2[i] || 0; // remote
+      const l = v1[i] || 0; // local
+      if (s > l) return true;
+      if (s < l) return false;
+    }
+    return false;
+  }
+
+  // 2. Installed App Detection
   function isAppInstalled() {
     return (
       window.matchMedia('(display-mode: standalone)').matches ||
@@ -22,7 +33,6 @@
     );
   }
 
-  // 2. Hide Install Buttons if already installed
   function checkAndHideInstallButtons() {
     if (isAppInstalled()) {
       const installBtns = document.querySelectorAll('.btn-pwa-install');
@@ -32,219 +42,205 @@
     }
   }
 
-  // 3. Inject Version Badges
-  function injectVersionBadges() {
-    const versionHolders = document.querySelectorAll('.bdc-version-tag');
-    versionHolders.forEach(el => {
-      el.innerText = CURRENT_VERSION;
-      el.title = "Click to see What's New";
-      el.style.cursor = "pointer";
-      el.onclick = () => showWhatsNewModal(CURRENT_VERSION, WHATS_NEW, false);
+  // 3. wosBDC Style Floating App Update Alert Sheet
+  function showUpdateBanner(updateData, isManualPreview = false) {
+    if (document.getElementById('app-update-modal-banner')) return;
+    if (!isManualPreview) {
+      if (localStorage.getItem('bdc_dismissed_update') === updateData.version) return;
+      if (localStorage.getItem('bdc_app_version') === updateData.version) return;
+    }
+
+    const banner = document.createElement('div');
+    banner.id = 'app-update-modal-banner';
+    banner.style.cssText = `
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(120%);
+      width: calc(100% - 32px);
+      max-width: 480px;
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.98), rgba(30, 27, 75, 0.98));
+      border: 1px solid rgba(168, 85, 247, 0.6);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85), 0 0 30px rgba(168, 85, 247, 0.3);
+      border-radius: 20px;
+      padding: 20px;
+      z-index: 999999;
+      color: #f1f5f9;
+      font-family: 'Outfit', -apple-system, sans-serif;
+      backdrop-filter: blur(16px);
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    `;
+
+    const notesList = (updateData.notes || updateData.highlights || [
+      "Converted BDC Vault into an installable Web App.",
+      "Added live Borrower Directory to Executive Center.",
+      "Built ledger transaction editor with balance recalculations."
+    ])
+      .map(n => `<li style="margin-bottom: 6px; font-size: 0.88rem; color: #e2e8f0; display:flex; align-items:flex-start; gap:8px;"><span style="color:#a855f7; font-weight:bold;">✨</span><span>${n}</span></li>`)
+      .join('');
+
+    banner.innerHTML = `
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom: 12px;">
+        <div style="display:flex; align-items:center; gap: 10px;">
+          <span style="font-size: 1.6rem; filter: drop-shadow(0 0 10px #a855f7);">💎</span>
+          <div>
+            <div style="font-weight: 800; font-size: 1.08rem; color: #ffffff;">BDC Vault Update Ready!</div>
+            <div style="font-size: 0.8rem; color: #a855f7; font-weight:600;">New Version v${updateData.version} is available</div>
+          </div>
+        </div>
+        <span style="background: rgba(168, 85, 247, 0.2); border: 1px solid #a855f7; color: #d8b4fe; font-size: 0.78rem; font-weight: 700; padding: 3px 10px; border-radius: 12px;">v${updateData.version}</span>
+      </div>
+      
+      <div style="margin-bottom: 16px; background: rgba(0,0,0,0.3); padding: 12px 14px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.08);">
+        <div style="font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 8px;">What's New</div>
+        <ul style="list-style: none; margin: 0; padding: 0;">${notesList}</ul>
+      </div>
+
+      <div style="display:flex; gap: 10px;">
+        <button id="btn-force-update-app" style="flex: 2; background: linear-gradient(135deg, #a855f7, #6366f1); border: none; color: white; font-weight: 800; font-size: 0.95rem; padding: 12px; border-radius: 14px; cursor: pointer; box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4); transition: all 0.2s;">
+          ⚡ Update App Now
+        </button>
+        <button id="btn-dismiss-update-app" style="flex: 1; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #cbd5e1; font-weight: 600; font-size: 0.9rem; padding: 12px; border-radius: 14px; cursor: pointer;">
+          Later
+        </button>
+      </div>
+    `;
+
+    document.body.appendChild(banner);
+    setTimeout(() => {
+      banner.style.transform = 'translateX(-50%) translateY(0)';
+    }, 100);
+
+    document.getElementById('btn-force-update-app').addEventListener('click', async () => {
+      const btn = document.getElementById('btn-force-update-app');
+      btn.innerText = 'Updating & Reloading...';
+      btn.disabled = true;
+
+      localStorage.setItem('bdc_app_version', updateData.version);
+
+      if ('serviceWorker' in navigator) {
+        try {
+          const regs = await navigator.serviceWorker.getRegistrations();
+          for (let r of regs) await r.unregister();
+        } catch (e) {}
+      }
+      if ('caches' in window) {
+        try {
+          const keys = await caches.keys();
+          for (let k of keys) await caches.delete(k);
+        } catch (e) {}
+      }
+      window.location.href = window.location.pathname + '?v=' + Date.now() + window.location.hash;
+    });
+
+    document.getElementById('btn-dismiss-update-app').addEventListener('click', () => {
+      localStorage.setItem('bdc_dismissed_update', updateData.version);
+      banner.style.transform = 'translateX(-50%) translateY(120%)';
+      setTimeout(() => banner.remove(), 400);
     });
   }
 
-  // 4. Register Service Worker & Listen for Updates
+  // 4. Check App Version Engine (wosBDC Architecture)
+  async function checkAppVersion(isManualCheck = false, btn = null) {
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = '⏳ Checking...';
+    }
+    try {
+      let res = await fetch(`./version.json?t=${Date.now()}`, { cache: 'no-store' }).catch(() => null);
+      if (!res || !res.ok) {
+        res = await fetch(`/version.json?t=${Date.now()}`, { cache: 'no-store' }).catch(() => null);
+      }
+      if (!res || !res.ok) {
+        if (isManualCheck && btn) {
+          btn.innerHTML = '⚠️ Check Failed';
+          setTimeout(() => { btn.innerHTML = '↻ Check for Updates'; btn.disabled = false; }, 2500);
+        }
+        return;
+      }
+
+      const data = await res.json();
+      if (data && data.version) {
+        if (isVersionOutdated(CURRENT_BUILD_VERSION, data.version)) {
+          showUpdateBanner(data);
+          if (btn) {
+            btn.innerHTML = '✨ Update Available!';
+            btn.disabled = false;
+          }
+        } else {
+          localStorage.setItem('bdc_app_version', data.version);
+          if (isManualCheck) {
+            if (btn) {
+              btn.innerHTML = '✅ Up to Date!';
+              setTimeout(() => { btn.innerHTML = '↻ Check for Updates'; btn.disabled = false; }, 2500);
+            }
+            showUpdateBanner(data, true); // Show "What's New" preview even when up to date
+          }
+        }
+      }
+    } catch (err) {
+      if (isManualCheck && btn) {
+        btn.innerHTML = '↻ Check for Updates';
+        btn.disabled = false;
+      }
+    }
+  }
+
+  // 5. Version Badge Injection
+  function injectVersionBadges() {
+    const versionHolders = document.querySelectorAll('.bdc-version-tag');
+    versionHolders.forEach(el => {
+      el.innerText = `v${CURRENT_BUILD_VERSION}`;
+      el.title = "Click to check for updates & view changelog";
+      el.style.cursor = "pointer";
+      el.onclick = () => checkAppVersion(true);
+    });
+  }
+
+  // 6. Service Worker Registration
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('./sw.js')
         .then((reg) => {
-          console.log(`💎 BDC Vault Service Worker (${CURRENT_VERSION}) Registered!`);
+          console.log(`💎 BDC Vault Service Worker (v${CURRENT_BUILD_VERSION}) Registered!`);
 
-          // Check for existing waiting worker
+          // Check for waiting worker
           if (reg.waiting) {
-            waitingWorker = reg.waiting;
-            fetchLatestChangelogAndShow(true);
+            checkAppVersion();
           }
 
-          // Listen for new updates
           reg.addEventListener('updatefound', () => {
             const newWorker = reg.installing;
             if (newWorker) {
               newWorker.addEventListener('statechange', () => {
                 if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                  waitingWorker = newWorker;
-                  fetchLatestChangelogAndShow(true);
+                  checkAppVersion();
                 }
               });
             }
           });
 
-          // Check every 15 minutes
-          setInterval(() => { reg.update(); }, 15 * 60 * 1000);
+          // Check every 10 minutes
+          setInterval(() => {
+            reg.update();
+            checkAppVersion();
+          }, 10 * 60 * 1000);
 
           // Check on tab focus
           document.addEventListener('visibilitychange', () => {
             if (document.visibilityState === 'visible') {
               reg.update();
+              checkAppVersion();
             }
           });
         })
         .catch((err) => {
           console.warn('Service Worker registration skipped:', err);
         });
-
-      // Handle controller change (reload after update)
-      navigator.serviceWorker.addEventListener('controllerchange', () => {
-        if (!refreshing) {
-          refreshing = true;
-          window.location.reload();
-        }
-      });
     });
   }
 
-  async function fetchLatestChangelogAndShow(isLiveUpdate) {
-    try {
-      const res = await fetch('./version.json?t=' + Date.now());
-      if (res.ok) {
-        const data = await res.json();
-        showWhatsNewModal(data.version || CURRENT_VERSION, data.highlights || WHATS_NEW, isLiveUpdate);
-      } else {
-        showWhatsNewModal(CURRENT_VERSION, WHATS_NEW, isLiveUpdate);
-      }
-    } catch(e) {
-      showWhatsNewModal(CURRENT_VERSION, WHATS_NEW, isLiveUpdate);
-    }
-  }
-
-  // 5. App Store Style "What's New" Sheet
-  function showWhatsNewModal(version, notes, isLiveUpdate) {
-    const existing = document.getElementById('pwaWhatsNewModal');
-    if (existing) existing.remove();
-
-    const overlay = document.createElement('div');
-    overlay.id = 'pwaWhatsNewModal';
-    overlay.style.cssText = `
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.75);
-      backdrop-filter: blur(12px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 999999;
-      padding: 20px;
-      animation: fadeIn 0.25s ease;
-    `;
-
-    const notesHtml = notes.map(item => `
-      <li style="margin-bottom: 8px; color: #e2e8f0; font-size: 0.92rem; line-height: 1.4; display: flex; align-items: flex-start; gap: 8px;">
-        <span style="color: #a855f7; font-weight: bold; font-size: 1.1rem; line-height: 1;">•</span>
-        <span>${item}</span>
-      </li>
-    `).join('');
-
-    const actionBtnHtml = isLiveUpdate ? `
-      <button onclick="window.reloadAppForUpdate()" style="
-        flex: 1;
-        background: linear-gradient(135deg, #a855f7, #6366f1);
-        color: white;
-        border: none;
-        padding: 14px 20px;
-        border-radius: 14px;
-        font-weight: 700;
-        font-size: 0.95rem;
-        cursor: pointer;
-        box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4);
-        transition: all 0.2s;
-      ">🔄 Update & Refresh Now</button>
-      <button onclick="document.getElementById('pwaWhatsNewModal').remove()" style="
-        background: rgba(255, 255, 255, 0.08);
-        color: #94a3b8;
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        padding: 14px 18px;
-        border-radius: 14px;
-        font-weight: 600;
-        font-size: 0.9rem;
-        cursor: pointer;
-      ">Later</button>
-    ` : `
-      <button onclick="document.getElementById('pwaWhatsNewModal').remove()" style="
-        width: 100%;
-        background: linear-gradient(135deg, #a855f7, #6366f1);
-        color: white;
-        border: none;
-        padding: 14px 20px;
-        border-radius: 14px;
-        font-weight: 700;
-        font-size: 0.95rem;
-        cursor: pointer;
-        box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4);
-      ">Got it ➔</button>
-    `;
-
-    overlay.innerHTML = `
-      <div style="
-        background: #0f172a;
-        border: 1px solid rgba(168, 85, 247, 0.4);
-        border-radius: 24px;
-        padding: 32px 28px;
-        max-width: 440px;
-        width: 100%;
-        box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.9), 0 0 30px rgba(168, 85, 247, 0.2);
-        font-family: 'Outfit', sans-serif;
-      ">
-        <!-- App Header (App Store Style) -->
-        <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 20px;">
-          <div style="
-            width: 56px; height: 56px;
-            background: linear-gradient(135deg, #1e1b4b, #0f172a);
-            border: 2px solid rgba(168, 85, 247, 0.5);
-            border-radius: 16px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 28px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
-          ">💎</div>
-          <div>
-            <h2 style="margin: 0; color: white; font-size: 1.35rem; font-weight: 800;">BDC Vault</h2>
-            <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
-              <span style="
-                background: rgba(168, 85, 247, 0.2);
-                color: #d8b4fe;
-                border: 1px solid rgba(168, 85, 247, 0.4);
-                padding: 2px 8px;
-                border-radius: 6px;
-                font-size: 0.75rem;
-                font-weight: 700;
-              ">${version}</span>
-              <span style="color: #64748b; font-size: 0.8rem;">${isLiveUpdate ? 'Update Available' : 'Installed Version'}</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- What's New Header -->
-        <div style="border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 16px; margin-bottom: 12px;">
-          <h4 style="margin: 0 0 10px 0; color: #f8fafc; font-size: 0.95rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
-            What's New in ${version}
-          </h4>
-          <ul style="list-style: none; padding: 0; margin: 0;">
-            ${notesHtml}
-          </ul>
-        </div>
-
-        <!-- Actions -->
-        <div style="display: flex; gap: 10px; margin-top: 24px;">
-          ${actionBtnHtml}
-        </div>
-      </div>
-    `;
-
-    document.body.appendChild(overlay);
-  }
-
-  window.showWhatsNewModal = function() {
-    showWhatsNewModal(CURRENT_VERSION, WHATS_NEW, false);
-  };
-
-  window.reloadAppForUpdate = function() {
-    if (waitingWorker) {
-      waitingWorker.postMessage({ action: 'skipWaiting' });
-    } else {
-      window.location.reload(true);
-    }
-  };
-
-  // 6. Handle Install Prompt
+  // 7. Install Prompt Management
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
@@ -274,7 +270,6 @@
     checkAndHideInstallButtons();
   });
 
-  // Global helper for manual install click
   window.triggerPWAInstall = function() {
     if (isAppInstalled()) {
       alert("💎 BDC Vault is already installed and running in native App mode.");
@@ -284,10 +279,7 @@
     if (deferredPrompt) {
       deferredPrompt.prompt();
     } else {
-      const isIos = () => {
-        const userAgent = window.navigator.userAgent.toLowerCase();
-        return /iphone|ipad|ipod/.test(userAgent);
-      };
+      const isIos = () => /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
       if (isIos()) {
         alert("To install BDC Vault on iOS: Tap the Safari Share button (square with arrow ⬆️) and select 'Add to Home Screen' 📲");
       } else {
@@ -296,9 +288,14 @@
     }
   };
 
-  // Initial checks on load
+  // Expose helpers to window
+  window.checkAppVersion = checkAppVersion;
+  window.showUpdateBanner = showUpdateBanner;
+
+  // On DOM Ready
   document.addEventListener('DOMContentLoaded', () => {
     checkAndHideInstallButtons();
     injectVersionBadges();
+    checkAppVersion();
   });
 })();

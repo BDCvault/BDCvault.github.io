@@ -1,9 +1,9 @@
 {
-  "version": "v4.7.1",
+  "version": "4.7.2",
   "releaseDate": "September 2, 2026",
-  "highlights": [
-    "Removed subtitle from main navigation banner for clean luxury aesthetic.",
-    "Updated version badge display to v4.7.1.",
-    "Streamlined navbar branding across desktop and mobile."
+  "notes": [
+    "Integrated wosBDC luxury app update alert system.",
+    "Added automatic cache-busting on version refresh.",
+    "Enabled manual and automatic background update checks."
   ]
 }
