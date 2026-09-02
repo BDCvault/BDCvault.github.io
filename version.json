@@ -1,9 +1,9 @@
 {
-  "version": "4.7.7",
+  "version": "4.7.8",
   "releaseDate": "September 2, 2026",
   "notes": [
-    "Added custom GitHub Actions workflow with luxury branding.",
-    "Streamlined CI/CD build and deployment pipeline.",
-    "Enabled manual workflow dispatch triggers on GitHub."
+    "Added live borrower accounts auto-loader to Executive Center.",
+    "Added 1-click email activation dispatcher for all database users.",
+    "Integrated auto-filling borrower selector for password and invite tools."
   ]
 }

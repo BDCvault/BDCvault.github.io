@@ -469,36 +469,50 @@
       <!-- SECTION 4: PASSWORDS & BORROWER SETUP -->
       <div id="sectionAccounts" style="display:none;">
         
-        <!-- CARD A: DIRECT SET PASSWORD -->
+        <!-- CARD A: LIVE BORROWER ACCOUNTS DIRECTORY & QUICK DISPATCH -->
         <div class="card" style="margin-bottom:20px;">
-          <h3 style="font-family:var(--font-heading); font-size:1.25rem; margin-bottom:8px; color:white;">⚡ Set / Change Borrower Password</h3>
-          <p style="color:var(--text-muted); font-size:0.88rem; margin-bottom:16px;">
-            Directly configure a password for any borrower so they can log in immediately.
-          </p>
-          <form onsubmit="handleAdminSetPassword(event)">
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
-              <div class="form-group">
-                <label>Borrower Email Address</label>
-                <input type="email" id="adminSetEmail" placeholder="e.g. borrower@example.com" required>
-              </div>
-              <div class="form-group">
-                <label>New Password</label>
-                <input type="text" id="adminSetNewPw" placeholder="e.g. Vault2026!" minlength="6" required>
-              </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:10px;">
+            <div>
+              <h3 style="font-family:var(--font-heading); font-size:1.25rem; margin-bottom:4px; color:white;">👥 Active Borrower Accounts</h3>
+              <p style="color:var(--text-muted); font-size:0.85rem; margin:0;">
+                All borrowers in your database. Dispatch setup invitations or configure passwords with 1 click.
+              </p>
             </div>
-            <button type="submit" id="btnAdminSetPw" class="btn-primary" style="width:100%; margin-top:10px;">
-              🔑 Update Password in Database
-            </button>
-            <div id="adminSetPwStatus" style="text-align:center; margin-top:12px; font-weight:600; display:none;"></div>
-          </form>
+            <button class="action-btn-sm btn-edit" onclick="loadBorrowerAccountsList()" style="padding:8px 14px; font-size:0.85rem;">🔄 Refresh Users</button>
+          </div>
+
+          <div style="overflow-x:auto;">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Borrower</th>
+                  <th>Email Address</th>
+                  <th>Starting Principal</th>
+                  <th>Current Balance</th>
+                  <th>Quick Actions</th>
+                </tr>
+              </thead>
+              <tbody id="borrowerAccountsTableBody">
+                <tr><td colspan="5" style="text-align:center; padding:20px; color:var(--text-muted);">Loading registered borrowers...</td></tr>
+              </tbody>
+            </table>
+          </div>
         </div>
 
-        <!-- CARD B: SEND EMAIL ACTIVATION INVITATION -->
-        <div class="card">
+        <!-- CARD B: SEND EMAIL ACTIVATION INVITATION (AUTO-LOADED) -->
+        <div class="card" style="margin-bottom:20px;">
           <h3 style="font-family:var(--font-heading); font-size:1.25rem; margin-bottom:8px; color:white;">✉️ Send Account Activation & Password Setup Email</h3>
           <p style="color:var(--text-muted); font-size:0.88rem; margin-bottom:16px;">
             Dispatches a branded BDC Vault invitation email with an encrypted 48-hour password setup link.
           </p>
+
+          <div class="form-group" style="margin-bottom:16px;">
+            <label style="color:#d8b4fe; font-weight:700;">⚡ Choose Borrower from Database (Auto-Fills Form)</label>
+            <select id="accountBorrowerSelect" onchange="onAccountBorrowerSelected(this.value)" style="width:100%; border-color:rgba(168,85,247,0.4); background:rgba(15,23,42,0.9); font-weight:600; color:white;">
+              <option value="">-- Select a Borrower to Auto-Fill --</option>
+            </select>
+          </div>
+
           <form onsubmit="handleAdminSendInvite(event)">
             <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px;">
               <div class="form-group">
@@ -517,7 +531,31 @@
             <button type="submit" id="btnAdminInvite" class="btn-primary" style="width:100%; margin-top:10px;">
               📧 Dispatch Activation Email
             </button>
-            <div id="adminInviteStatus" style="text-align:center; margin-top:12px; font-weight:600; display:none;"></div>
+            <div id="adminInviteStatus" style="text-align:center; margin-top:12px; font-weight:600; display:none; padding:10px; border-radius:10px;"></div>
+          </form>
+        </div>
+
+        <!-- CARD C: DIRECT SET PASSWORD -->
+        <div class="card">
+          <h3 style="font-family:var(--font-heading); font-size:1.25rem; margin-bottom:8px; color:white;">⚡ Set / Change Borrower Password</h3>
+          <p style="color:var(--text-muted); font-size:0.88rem; margin-bottom:16px;">
+            Directly configure a password for any borrower so they can log in immediately.
+          </p>
+          <form onsubmit="handleAdminSetPassword(event)">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+              <div class="form-group">
+                <label>Borrower Email Address</label>
+                <input type="email" id="adminSetEmail" placeholder="e.g. borrower@example.com" required>
+              </div>
+              <div class="form-group">
+                <label>New Password</label>
+                <input type="text" id="adminSetNewPw" placeholder="e.g. Vault2026!" minlength="6" required>
+              </div>
+            </div>
+            <button type="submit" id="btnAdminSetPw" class="btn-primary" style="width:100%; margin-top:10px;">
+              🔑 Update Password in Database
+            </button>
+            <div id="adminSetPwStatus" style="text-align:center; margin-top:12px; font-weight:600; display:none; padding:10px; border-radius:10px;"></div>
           </form>
         </div>
 
@@ -681,6 +719,7 @@
 
       if (section === 'borrowers') loadBorrowersDirectory();
       if (section === 'ledger') loadDetailedLedger();
+      if (section === 'accounts') loadBorrowerAccountsList();
     }
 
     function toggleAddTxForm() {
@@ -913,6 +952,99 @@
     }
 
     // --- 3. PASSWORDS & ACCOUNTS ---
+    async function loadBorrowerAccountsList() {
+      const tbody = document.getElementById('borrowerAccountsTableBody');
+      const select = document.getElementById('accountBorrowerSelect');
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px; color:var(--text-muted);">Loading registered borrowers...</td></tr>';
+      
+      try {
+        const borrowers = cachedBorrowers.length ? cachedBorrowers : (await fetchBankApi('borrowers') || []);
+        cachedBorrowers = borrowers;
+        
+        // Populate select dropdown
+        select.innerHTML = '<option value="">-- Select a Borrower to Auto-Fill --</option>';
+        borrowers.forEach(b => {
+          const opt = document.createElement('option');
+          opt.value = b.name;
+          opt.innerText = `${b.name} (${b.email || 'No email'}) - Balance: ${formatMoney(b.balance)}`;
+          select.appendChild(opt);
+        });
+
+        if (borrowers.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px; color:var(--text-muted);">No borrowers found in database.</td></tr>';
+          return;
+        }
+
+        let html = '';
+        borrowers.forEach(b => {
+          const emailDisplay = b.email ? `<span style="color:#cbd5e1;">${b.email}</span>` : `<span style="color:#fb7185; font-style:italic;">No Email Listed</span>`;
+          html += `
+            <tr>
+              <td><strong style="color:white; font-size:0.95rem;">${b.name}</strong></td>
+              <td>${emailDisplay}</td>
+              <td style="color:#94a3b8;">${formatMoney(b.principal)}</td>
+              <td style="font-family:var(--font-heading); font-weight:700; color:#fb7185;">${formatMoney(b.balance)}</td>
+              <td>
+                <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                  <button class="action-btn-sm btn-edit" onclick="quickInviteBorrower('${b.name}', '${b.email || ''}', ${b.principal || 0})" style="background:rgba(168,85,247,0.2); color:#d8b4fe; border-color:rgba(168,85,247,0.4);">
+                    📧 1-Click Invite
+                  </button>
+                  <button class="action-btn-sm btn-edit" onclick="quickSetBorrowerPassword('${b.email || ''}')">
+                    🔑 Set Pw
+                  </button>
+                </div>
+              </td>
+            </tr>
+          `;
+        });
+        tbody.innerHTML = html;
+      } catch(e) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#fb7185; padding:20px;">Failed to load borrowers from database.</td></tr>';
+      }
+    }
+
+    function onAccountBorrowerSelected(borrowerName) {
+      if (!borrowerName) return;
+      const borrower = cachedBorrowers.find(b => b.name === borrowerName);
+      if (borrower) {
+        document.getElementById('adminInviteName').value = borrower.name || '';
+        document.getElementById('adminInviteEmail').value = borrower.email || '';
+        document.getElementById('adminInvitePrincipal').value = borrower.principal || '';
+        if (borrower.email) {
+          document.getElementById('adminSetEmail').value = borrower.email;
+        }
+      }
+    }
+
+    function quickInviteBorrower(name, email, principal) {
+      if (!email) {
+        alert(`❌ Please provide an email address for ${name} in the form below first.`);
+        document.getElementById('accountBorrowerSelect').value = name;
+        onAccountBorrowerSelected(name);
+        document.getElementById('adminInviteEmail').focus();
+        return;
+      }
+
+      document.getElementById('accountBorrowerSelect').value = name;
+      onAccountBorrowerSelected(name);
+      
+      if (confirm(`📧 Dispatch official BDC Vault activation and password setup email to ${name} (${email})?`)) {
+        const fakeEvent = { preventDefault: () => {} };
+        handleAdminSendInvite(fakeEvent);
+      }
+    }
+
+    function quickSetBorrowerPassword(email) {
+      if (!email) {
+        alert(`❌ No email found for this borrower. Please enter their email below.`);
+        document.getElementById('adminSetEmail').focus();
+        return;
+      }
+      document.getElementById('adminSetEmail').value = email;
+      document.getElementById('adminSetNewPw').focus();
+      document.getElementById('adminSetNewPw').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
     async function handleAdminSetPassword(e) {
       e.preventDefault();
       const email = document.getElementById('adminSetEmail').value.trim();
