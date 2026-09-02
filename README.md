@@ -30,6 +30,7 @@
 
 | Version | Release Date | Summary of Features & Fixes |
 | :--- | :--- | :--- |
+| **`v4.7.7`** | Sep 2, 2026 | Added custom GitHub Actions workflow with luxury branding. |
 | **`v4.7.6`** | Sep 2, 2026 | Added Google Sign-In authentication for borrower portal with Firebase. |
 | **`v4.7.5`** | Sep 2, 2026 | Hardcoded statement links to BDC Vault portal and synced Google Sheets CRM. |
 | **`v4.7.4`** | Sep 2, 2026 | Purged legacy Google Apps Script URLs from email dispatchers. |

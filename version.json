@@ -1,9 +1,9 @@
 {
-  "version": "4.7.6",
+  "version": "4.7.7",
   "releaseDate": "September 2, 2026",
   "notes": [
-    "Added Google Sign-In authentication for borrower portal.",
-    "Integrated Firebase Google Auth on login page.",
-    "Deployed Google Apps Script v65 with verified Google login."
+    "Added custom GitHub Actions workflow with luxury branding.",
+    "Streamlined CI/CD build and deployment pipeline.",
+    "Enabled manual workflow dispatch triggers on GitHub."
   ]
 }
