@@ -1,13 +1,11 @@
 // BDC Vault PWA & App Store Style Update Engine
 (function() {
-  const CURRENT_VERSION = "v4.7.0";
+  const CURRENT_VERSION = "v4.7.1";
   const RELEASE_DATE = "September 2, 2026";
   const WHATS_NEW = [
-    "Converted BDC Vault into an installable Web App.",
-    "Added live Borrower Directory to Executive Center.",
-    "Built ledger transaction editor with balance recalculations.",
-    "Enforced mandatory borrower password authentication.",
-    "Added App Store style live update alerts."
+    "Removed subtitle from main navigation banner for clean luxury aesthetic.",
+    "Updated version badge display to v4.7.1.",
+    "Streamlined navbar branding across desktop and mobile."
   ];
 
   let waitingWorker = null;
