@@ -1,6 +1,6 @@
 // Bank of Diva - Master Web Client
 const BANK_CONFIG = {
-  API_BASE_URL: 'https://script.google.com/macros/s/AKfycbwGlxaca23x5n2L-CTf6rh-FoI5paj29HDpikyXPJOXLvSYmF7uqlr4A1kFmuNqOHc/exec',
+  API_BASE_URL: 'https://script.google.com/macros/s/AKfycbydyFKhliQWC05y5xqXBjkbBJhFCN0STd24sVJ2n91fw6CnvH5UtFsO4zvFFeJF_mY/exec',
   CASH_APP_HANDLE: '$BrianDivaCox',
   CASH_APP_URL: 'https://cash.app/$BrianDivaCox',
   VENMO_HANDLE: '@BrianDivaCox',

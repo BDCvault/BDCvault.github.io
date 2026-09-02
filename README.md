@@ -18,10 +18,9 @@
 
 ## 🚀 Live Links
 
-* **Live Web App**: [https://script.google.com/macros/s/AKfycbwqgFVuo9a2Ey8wsQo3g5As1lIQkhmgQwD71Yci0NSj1lGnTdj3Xp8n0g8PY6w6opI/exec](https://script.google.com/macros/s/AKfycbwqgFVuo9a2Ey8wsQo3g5As1lIQkhmgQwD71Yci0NSj1lGnTdj3Xp8n0g8PY6w6opI/exec)
-* **Borrower Sign In**: `login.html`
-* **Executive Command Center**: `admin.html`
-* **Email Showcase**: `email_previews.html`
+* **Live Web App**: [https://bdcvault.github.io/](https://bdcvault.github.io/)
+* **Borrower Sign In**: [https://bdcvault.github.io/login.html](https://bdcvault.github.io/login.html)
+* **Executive Command Center**: [https://bdcvault.github.io/admin.html](https://bdcvault.github.io/admin.html)
 
 ---
 
