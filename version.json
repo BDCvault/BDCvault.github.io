@@ -1,9 +1,9 @@
 {
-  "version": "4.7.2",
+  "version": "4.7.3",
   "releaseDate": "September 2, 2026",
   "notes": [
-    "Integrated wosBDC luxury app update alert system.",
-    "Added automatic cache-busting on version refresh.",
-    "Enabled manual and automatic background update checks."
+    "Updated all account statement emails with new portal URL.",
+    "Synchronized monthly billing statement links with BDC Vault.",
+    "Deployed Google Apps Script v62 with updated notification engine."
   ]
 }
