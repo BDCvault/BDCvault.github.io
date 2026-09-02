@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BDC Loans | Password Setup</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .setup-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      padding: 40px 32px;
+      max-width: 480px;
+      width: 100%;
+      text-align: center;
+      margin: 60px auto;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <nav class="navbar">
+      <a href="index.html" class="brand">
+        <div class="brand-logo">💎</div>
+        <div>
+          <div class="brand-title">BDC Loans</div>
+          <span class="brand-sub">Password Setup</span>
+        </div>
+      </a>
+      <a href="login.html" class="nav-link">Borrower Sign In ➔</a>
+    </nav>
+
+    <div class="setup-card">
+      <div style="font-size:36px; margin-bottom:12px;">💎</div>
+      <h1 style="font-family:var(--font-heading); font-size:1.6rem; color:white; margin-bottom:6px;">Set Password</h1>
+      <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:24px;">Enter your new password to activate your borrower portal account.</p>
+
+      <form onsubmit="handleWebSetPassword(event)">
+        <div style="text-align:left; margin-bottom:16px;">
+          <label style="display:block; font-size:0.85rem; color:#cbd5e1; font-weight:600; margin-bottom:6px;">Create Password</label>
+          <input type="password" id="newPassword" required minlength="6" placeholder="At least 6 characters" style="width:100%;">
+        </div>
+
+        <div style="text-align:left; margin-bottom:20px;">
+          <label style="display:block; font-size:0.85rem; color:#cbd5e1; font-weight:600; margin-bottom:6px;">Confirm Password</label>
+          <input type="password" id="confirmPassword" required minlength="6" placeholder="Re-enter your password" style="width:100%;">
+        </div>
+
+        <button type="submit" class="btn-primary" id="saveBtn" style="width:100%; padding:15px; border-radius:12px; font-size:1rem;">
+          🔑 Save Password & Enter Portal
+        </button>
+
+        <div id="saveStatus" style="margin-top:16px; font-size:0.88rem; display:none;"></div>
+      </form>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token') || '';
+
+    async function handleWebSetPassword(e) {
+      e.preventDefault();
+      const pw = document.getElementById('newPassword').value;
+      const confirmPw = document.getElementById('confirmPassword').value;
+      const btn = document.getElementById('saveBtn');
+      const status = document.getElementById('saveStatus');
+
+      if (pw !== confirmPw) {
+        status.style.display = 'block';
+        status.style.color = '#fb7185';
+        status.innerText = "❌ Passwords do not match.";
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerText = "Saving...";
+
+      try {
+        const res = await fetchBankApi('set_password', { token: token, password: pw });
+        btn.disabled = false;
+        btn.innerText = "🔑 Save Password & Enter Portal";
+
+        if (res.success) {
+          status.style.display = 'block';
+          status.style.color = '#34d399';
+          status.innerText = "✅ Password saved! Redirecting...";
+          setTimeout(() => {
+            window.location.href = "portal.html?client=" + encodeURIComponent(res.clientName);
+          }, 1200);
+        } else {
+          status.style.display = 'block';
+          status.style.color = '#fb7185';
+          status.innerText = "❌ " + (res.message || "Failed to set password.");
+        }
+      } catch(err) {
+        btn.disabled = false;
+        btn.innerText = "🔑 Save Password & Enter Portal";
+        status.style.display = 'block';
+        status.style.color = '#fb7185';
+        status.innerText = "❌ Network error. Please try again.";
+      }
+    }
+  </script>
+</body>
+</html>

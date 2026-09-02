@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BDC Vault | Private Capital & Lending</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <div class="container">
+    
+    <!-- NAVBAR -->
+    <nav class="navbar">
+      <a href="index.html" class="brand">
+        <div class="brand-logo">💎</div>
+        <div>
+          <div class="brand-title">BDC Vault</div>
+          <span class="brand-sub">Private Lending • Bank of Diva</span>
+        </div>
+      </a>
+      <div class="nav-links">
+        <a href="login.html" class="nav-link" style="color:#d8b4fe;">🔑 Borrower Sign In</a>
+        <a href="admin.html" class="nav-link">🔒 Admin Center</a>
+        <a href="apply.html" class="btn-primary">Request Account</a>
+      </div>
+    </nav>
+
+    <!-- HERO -->
+    <div style="text-align:center; max-width:800px; margin: 40px auto 60px;">
+      <div class="badge badge-due" style="margin-bottom:20px; font-size:0.85rem;">
+        💎 Official Private Client & Lending Portal
+      </div>
+      <h1 style="font-family:var(--font-heading); font-size:3.5rem; font-weight:800; line-height:1.15; margin-bottom:20px; letter-spacing:-1px;">
+        Intelligent Personal Lending.<br>
+        <span style="background:linear-gradient(135deg, #c084fc, #818cf8, #34d399); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">Powered by Bank of Diva.</span>
+      </h1>
+      <p style="color:var(--text-muted); font-size:1.15rem; margin-bottom:40px;">
+        Access your real-time loan statements, track payoff progress, review automated interest, and make instant settlements with complete transparency.
+      </p>
+
+      <!-- SEARCH CARD -->
+      <div class="card" style="max-width:560px; margin:0 auto; text-align:left;">
+        <h3 style="font-family:var(--font-heading); font-size:1.3rem; margin-bottom:6px; color:white;">🔍 Access Your Client Portal</h3>
+        <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:20px;">Enter your client name below to securely view your live statement & ledger.</p>
+        
+        <form onsubmit="searchClientPortal(event)" style="display:flex; gap:10px;">
+          <input type="text" id="clientSearch" placeholder="e.g. Crystal, Jane Doe..." required style="flex:1;">
+          <button type="submit" class="btn-primary">View Statement ➔</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- FEATURES -->
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:20px; margin-bottom:60px;">
+      <div class="card" style="padding:24px;">
+        <div style="font-size:32px; margin-bottom:14px;">⚡</div>
+        <h4 style="font-family:var(--font-heading); font-size:1.15rem; margin-bottom:8px; color:white;">Cash App & Venmo Sync</h4>
+        <p style="color:var(--text-muted); font-size:0.88rem;">Settle payments effortlessly via $BrianDivaCox or Venmo @BrianDivaCox with instant ledger recalculation.</p>
+      </div>
+
+      <div class="card" style="padding:24px;">
+        <div style="font-size:32px; margin-bottom:14px;">📊</div>
+        <h4 style="font-family:var(--font-heading); font-size:1.15rem; margin-bottom:8px; color:white;">Live Payoff Radar</h4>
+        <p style="color:var(--text-muted); font-size:0.88rem;">Interactive payoff progress meter with countdowns to the 11th payment deadline.</p>
+      </div>
+
+      <div class="card" style="padding:24px;">
+        <div style="font-size:32px; margin-bottom:14px;">📑</div>
+        <h4 style="font-family:var(--font-heading); font-size:1.15rem; margin-bottom:8px; color:white;">1-Click PDF Statements</h4>
+        <p style="color:var(--text-muted); font-size:0.88rem;">Download official, watermarked Bank of Diva account statements on demand.</p>
+      </div>
+
+      <div class="card" style="padding:24px;">
+        <div style="font-size:32px; margin-bottom:14px;">🛡️</div>
+        <h4 style="font-family:var(--font-heading); font-size:1.15rem; margin-bottom:8px; color:white;">27.9% APR & Zero Junk Fees</h4>
+        <p style="color:var(--text-muted); font-size:0.88rem;">Clear, transparent monthly interest calculations with automated ledger security.</p>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+      &copy; 2026 Bank of Diva. All rights reserved. Private Lending & Capital Management Platform.
+    </footer>
+
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    function searchClientPortal(e) {
+      e.preventDefault();
+      const name = document.getElementById('clientSearch').value.trim();
+      if (!name) return;
+      window.location.href = 'portal.html?client=' + encodeURIComponent(name);
+    }
+  </script>
+</body>
+</html>

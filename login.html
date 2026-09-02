@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BDC Loans | Borrower Sign In</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .login-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      padding: 40px 32px;
+      max-width: 440px;
+      width: 100%;
+      text-align: center;
+      margin: 60px auto;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <nav class="navbar">
+      <a href="index.html" class="brand">
+        <div class="brand-logo">💎</div>
+        <div>
+          <div class="brand-title">BDC Loans</div>
+          <span class="brand-sub">Borrower Portal</span>
+        </div>
+      </a>
+      <a href="index.html" class="nav-link">Home ➔</a>
+    </nav>
+
+    <div class="login-card">
+      <div style="font-size:36px; margin-bottom:12px;">💎</div>
+      <h1 style="font-family:var(--font-heading); font-size:1.6rem; color:white; margin-bottom:6px;">BDC Loans</h1>
+      <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:24px;">Sign in with your email & password to view your loan statement.</p>
+
+      <form onsubmit="handleWebLogin(event)">
+        <div style="text-align:left; margin-bottom:16px;">
+          <label style="display:block; font-size:0.85rem; color:#cbd5e1; font-weight:600; margin-bottom:6px;">Email Address</label>
+          <input type="email" id="loginEmail" required placeholder="e.g. borrower@example.com" style="width:100%;">
+        </div>
+
+        <div style="text-align:left; margin-bottom:20px;">
+          <label style="display:block; font-size:0.85rem; color:#cbd5e1; font-weight:600; margin-bottom:6px;">Password</label>
+          <input type="password" id="loginPassword" required placeholder="••••••••" style="width:100%;">
+        </div>
+
+        <button type="submit" class="btn-primary" id="loginBtn" style="width:100%; padding:15px; border-radius:12px; font-size:1rem;">
+          Sign In ➔
+        </button>
+
+        <div id="loginStatus" style="margin-top:16px; font-size:0.88rem; display:none;"></div>
+      </form>
+
+      <div style="display:flex; justify-content:space-between; margin-top:24px; font-size:0.85rem;">
+        <a href="reset.html" style="color:var(--primary-purple); text-decoration:none;">Forgot password?</a>
+        <a href="index.html" style="color:var(--primary-purple); text-decoration:none;">Portal Home</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    async function handleWebLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value;
+      const pw = document.getElementById('loginPassword').value;
+      const btn = document.getElementById('loginBtn');
+      const status = document.getElementById('loginStatus');
+
+      btn.disabled = true;
+      btn.innerText = "Signing in...";
+
+      try {
+        const res = await fetchBankApi('login', { email: email, password: pw });
+        btn.disabled = false;
+        btn.innerText = "Sign In ➔";
+
+        if (res.success) {
+          status.style.display = 'block';
+          status.style.color = '#34d399';
+          status.innerText = "✅ Welcome, " + res.clientName + "! Loading statement...";
+          setTimeout(() => {
+            window.location.href = "portal.html?client=" + encodeURIComponent(res.clientName);
+          }, 1000);
+        } else {
+          status.style.display = 'block';
+          status.style.color = '#fb7185';
+          status.innerText = "❌ " + (res.message || "Invalid credentials.");
+        }
+      } catch(err) {
+        btn.disabled = false;
+        btn.innerText = "Sign In ➔";
+        status.style.display = 'block';
+        status.style.color = '#fb7185';
+        status.innerText = "❌ Network error. Please try again.";
+      }
+    }
+  </script>
+</body>
+</html>

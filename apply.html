@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bank of Diva | Account Request</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <div class="container" style="max-width:480px; padding-top:40px;">
+    
+    <div style="text-align:center; margin-bottom:24px;">
+      <div style="display:inline-block; background:linear-gradient(135deg, #a855f7, #6366f1); color:white; width:48px; height:48px; line-height:48px; border-radius:14px; font-size:24px; box-shadow:0 0 15px rgba(168,85,247,0.4);">💎</div>
+      <h2 style="font-family:var(--font-heading); font-size:1.6rem; color:white; margin-top:8px;">Bank of Diva</h2>
+      <p style="color:var(--text-muted); font-size:0.88rem;">Private Account & Loan Application</p>
+    </div>
+
+    <div class="card">
+      <form onsubmit="handleApply(event)">
+        <div class="form-group">
+          <label>Full Legal Name</label>
+          <input type="text" id="applyName" placeholder="e.g. Jane Doe" required>
+        </div>
+
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="applyEmail" placeholder="jane@example.com" required>
+        </div>
+
+        <div class="form-group">
+          <label>Requested Starting Principal ($)</label>
+          <input type="number" id="applyPrincipal" placeholder="e.g. 5000">
+        </div>
+
+        <button type="submit" id="applyBtn" class="btn-primary" style="width:100%; margin-top:10px;">Submit Application</button>
+        <div id="applyStatus" style="text-align:center; margin-top:14px; font-weight:600; display:none;"></div>
+      </form>
+    </div>
+
+    <div style="text-align:center; margin-top:20px;">
+      <a href="index.html" class="nav-link">← Return to Bank of Diva Portal</a>
+    </div>
+
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    function handleApply(e) {
+      e.preventDefault();
+      const btn = document.getElementById('applyBtn');
+      const status = document.getElementById('applyStatus');
+      btn.disabled = true;
+      btn.innerText = "Submitting to Underwriting...";
+
+      setTimeout(() => {
+        btn.disabled = false;
+        btn.innerText = "Submit Application";
+        status.style.display = 'block';
+        status.style.color = '#34d399';
+        status.innerText = "✅ Application submitted! We will activate your account shortly.";
+      }, 1000);
+    }
+  </script>
+</body>
+</html>

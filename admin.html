@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BDC Vault | Executive Command Center</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  
+  <!-- Firebase App & Auth SDK (v10.12.0) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDd-YKspjMz-lWUWCdBe1zplzNCDWsM1mA",
+      authDomain: "bdc-vault.firebaseapp.com",
+      projectId: "bdc-vault",
+      storageBucket: "bdc-vault.firebasestorage.app",
+      messagingSenderId: "119058571389",
+      appId: "1:119058571389:web:107cafd0ea4c19823cd114",
+      measurementId: "G-KT6K937JT7"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: 'select_account' });
+
+    // Server-side authorization verification
+    async function verifyUserWithServer(email) {
+      try {
+        const res = await fetchBankApi('validate_admin', { email: email });
+        return res && res.success;
+      } catch(e) {
+        return false;
+      }
+    }
+
+    window.firebaseAuth = {
+      loginWithGoogle: async function() {
+        const btn = document.getElementById('googleSignInBtn');
+        const status = document.getElementById('authStatus');
+        btn.disabled = true;
+        btn.innerHTML = '⏳ Authenticating...';
+        status.style.display = 'none';
+
+        try {
+          const result = await signInWithPopup(auth, provider);
+          const user = result.user;
+          const email = (user.email || "").toLowerCase().trim();
+
+          const isAuthorized = await verifyUserWithServer(email);
+
+          if (isAuthorized) {
+            unlockDashboard(user);
+          } else {
+            await signOut(auth);
+            showAuthError('❌ Access Denied: Unauthorized account. This executive portal is restricted to authorized administrators only.');
+            btn.disabled = false;
+            btn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg> Sign in with Google`;
+          }
+        } catch (err) {
+          console.error("Auth Error:", err);
+          showAuthError('❌ Authentication cancelled or failed.');
+          btn.disabled = false;
+          btn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg> Sign in with Google`;
+        }
+      },
+      signOut: async function() {
+        await signOut(auth);
+        sessionStorage.removeItem('bdc_admin_auth');
+        window.location.reload();
+      }
+    };
+
+    // Listen for auth state changes
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const email = (user.email || "").toLowerCase().trim();
+        const isAuthorized = await verifyUserWithServer(email);
+        if (isAuthorized) {
+          unlockDashboard(user);
+        }
+      }
+    });
+  </script>
+
+  <style>
+    .auth-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      padding: 44px 32px;
+      max-width: 440px;
+      width: 100%;
+      text-align: center;
+      margin: 60px auto;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+    }
+    .google-btn-wrapper {
+      margin: 28px 0 10px;
+      display: flex;
+      justify-content: center;
+    }
+    .btn-google {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      background: white;
+      color: #1f2937;
+      font-weight: 700;
+      font-size: 0.95rem;
+      padding: 14px 24px;
+      border-radius: 14px;
+      border: none;
+      cursor: pointer;
+      width: 100%;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 15px rgba(255, 255, 255, 0.15);
+    }
+    .btn-google:hover {
+      background: #f1f5f9;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255, 255, 255, 0.25);
+    }
+    .session-badge {
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      border-radius: 14px;
+      padding: 12px 18px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+    }
+    .user-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 2px solid #10b981;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container" style="max-width:850px;">
+    
+    <!-- NAVBAR -->
+    <nav class="navbar">
+      <a href="index.html" class="brand">
+        <div class="brand-logo">💎</div>
+        <div>
+          <div class="brand-title">BDC Vault</div>
+          <span class="brand-sub">Executive Center</span>
+        </div>
+      </a>
+      <div style="display:flex; gap:16px; align-items:center;">
+        <a href="email_previews.html" class="nav-link">📧 Email Showcase</a>
+        <a href="index.html" class="nav-link">Portal Home ➔</a>
+        <button id="logoutBtn" onclick="window.firebaseAuth.signOut()" style="display:none; background:rgba(239,68,68,0.15); color:#fca5a5; border:1px solid rgba(239,68,68,0.3); padding:6px 14px; border-radius:8px; font-weight:600; cursor:pointer;">Sign Out</button>
+      </div>
+    </nav>
+
+    <!-- AUTH SCREEN -->
+    <div id="loginCard" class="auth-card">
+      <div style="font-size:40px; margin-bottom:12px;">🔒</div>
+      <h2 style="font-family:var(--font-heading); color:white; margin-bottom:6px;">Executive Authentication</h2>
+      <p style="color:var(--text-muted); font-size:0.88rem; line-height:1.5;">
+        Sign in with your authorized Google Account to unlock command metrics.
+      </p>
+
+      <!-- GOOGLE SIGN IN BUTTON -->
+      <div class="google-btn-wrapper">
+        <button id="googleSignInBtn" class="btn-google" onclick="window.firebaseAuth.loginWithGoogle()">
+          <svg width="20" height="20" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+          </svg>
+          Sign in with Google
+        </button>
+      </div>
+
+      <div id="authStatus" style="margin-top:16px; font-weight:600; font-size:0.88rem; display:none; padding:12px; border-radius:10px;"></div>
+    </div>
+
+    <!-- MAIN ADMIN DASHBOARD -->
+    <div id="dashboardView" style="display:none;">
+
+      <!-- SESSION BANNER -->
+      <div class="session-badge">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <img id="userAvatarImg" class="user-avatar" src="https://lh3.googleusercontent.com/a/default-user" alt="Avatar">
+          <div>
+            <div style="color:#34d399; font-weight:700;" id="sessionUserName">Administrator</div>
+            <div style="color:var(--text-muted); font-size:0.75rem;" id="sessionUserEmail">Executive Session Active</div>
+          </div>
+        </div>
+        <span style="color:#10b981; background:rgba(16,185,129,0.15); padding:4px 10px; border-radius:8px; font-weight:600; font-size:0.75rem;">
+          🛡️ Firebase Authorized
+        </span>
+      </div>
+
+      <!-- STATS -->
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:16px; margin-bottom:24px;">
+        <div class="card" style="padding:20px; margin:0;">
+          <div style="font-size:0.75rem; text-transform:uppercase; color:var(--text-muted); font-weight:600;">Total Loan Volume</div>
+          <div style="font-family:var(--font-heading); font-size:1.8rem; font-weight:800; color:white;" id="statTotalDebt">$0.00</div>
+        </div>
+        <div class="card" style="padding:20px; margin:0;">
+          <div style="font-size:0.75rem; text-transform:uppercase; color:var(--text-muted); font-weight:600;">Active Borrowers</div>
+          <div style="font-family:var(--font-heading); font-size:1.8rem; font-weight:800; color:white;" id="statTotalClients">0</div>
+        </div>
+        <div class="card" style="padding:20px; margin:0;">
+          <div style="font-size:0.75rem; text-transform:uppercase; color:var(--text-muted); font-weight:600;">Universal APR</div>
+          <div style="font-family:var(--font-heading); font-size:1.8rem; font-weight:800; color:var(--accent-gold);">27.90%</div>
+        </div>
+      </div>
+
+      <!-- TRANSACTION LOGGER -->
+      <div class="card">
+        <h3 style="font-family:var(--font-heading); font-size:1.25rem; margin-bottom:16px; color:white;">Post Transaction</h3>
+        <form onsubmit="submitTransaction(event)">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+            <div class="form-group">
+              <label>Borrower Name</label>
+              <select id="clientSelect" required></select>
+            </div>
+            <div class="form-group">
+              <label>Type</label>
+              <select id="txType">
+                <option value="Payment">Payment (- Balance)</option>
+                <option value="Loan">Loan / Charge (+ Balance)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Amount ($)</label>
+              <input type="number" step="0.01" id="txAmount" placeholder="e.g. 500" required>
+            </div>
+            <div class="form-group">
+              <label>Description / Note</label>
+              <input type="text" id="txDesc" placeholder="e.g. Settlement payment" required>
+            </div>
+          </div>
+          <button type="submit" class="btn-primary" style="width:100%; margin-top:10px;">Post to Ledger</button>
+          <div id="txStatus" style="text-align:center; margin-top:10px; font-weight:600; display:none;"></div>
+        </form>
+      </div>
+
+      <!-- RECENT ACTIVITY -->
+      <div class="card">
+        <h3 style="font-family:var(--font-heading); font-size:1.25rem; margin-bottom:16px; color:white;">Recent Audit Trail</h3>
+        <div id="adminActivityList">
+          <div style="color:var(--text-muted); text-align:center;">Loading audit trail...</div>
+        </div>
+      </div>
+
+    </div>
+
+    <footer>
+      BDC Vault &bull; Executive Command Center
+    </footer>
+
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    function unlockDashboard(user) {
+      document.getElementById('loginCard').style.display = 'none';
+      document.getElementById('dashboardView').style.display = 'block';
+      document.getElementById('logoutBtn').style.display = 'block';
+      
+      document.getElementById('sessionUserName').innerText = user.displayName || "Administrator";
+      document.getElementById('sessionUserEmail').innerText = user.email || "Executive Session Active";
+      if (user.photoURL) {
+        document.getElementById('userAvatarImg').src = user.photoURL;
+      }
+      
+      loadDashboard();
+    }
+
+    function showAuthError(msg) {
+      const status = document.getElementById('authStatus');
+      status.style.display = 'block';
+      status.style.background = 'rgba(239, 68, 68, 0.15)';
+      status.style.border = '1px solid rgba(239, 68, 68, 0.3)';
+      status.style.color = '#fca5a5';
+      status.innerText = msg;
+    }
+
+    async function loadDashboard() {
+      // 1. Fetch Analytics
+      const analytics = await fetchBankApi('analytics');
+      if (analytics) {
+        document.getElementById('statTotalDebt').innerText = formatMoney(analytics.totalDebt || 0);
+        document.getElementById('statTotalClients').innerText = analytics.totalClients || 0;
+      }
+
+      // 2. Fetch Clients
+      const clients = await fetchBankApi('clients') || ['Crystal'];
+      const select = document.getElementById('clientSelect');
+      select.innerHTML = '';
+      clients.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c;
+        opt.innerText = c;
+        select.appendChild(opt);
+      });
+
+      // 3. Fetch Activity
+      const activity = await fetchBankApi('activity') || [];
+      const actContainer = document.getElementById('adminActivityList');
+      if (activity.length === 0) {
+        actContainer.innerHTML = '<div style="color:var(--text-muted); text-align:center; padding:10px;">No recent activity.</div>';
+      } else {
+        let html = '';
+        activity.forEach(a => {
+          html += `
+            <div style="padding:10px; border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between;">
+              <div>
+                <strong style="color:white;">${a.client}</strong> &bull; ${a.description}
+                <div style="font-size:0.75rem; color:var(--text-muted);">${a.date} &bull; By ${a.manager}</div>
+              </div>
+              <div style="font-weight:700; color:${a.type==='Payment'?'#34d399':'#fb7185'}">
+                ${a.type==='Payment'?'-':'+'}${formatMoney(a.amount)}
+              </div>
+            </div>
+          `;
+        });
+        actContainer.innerHTML = html;
+      }
+    }
+
+    function submitTransaction(e) {
+      e.preventDefault();
+      const status = document.getElementById('txStatus');
+      status.style.display = 'block';
+      status.style.color = '#34d399';
+      status.innerText = '✅ Transaction queued and posted successfully!';
+      setTimeout(() => { status.style.display = 'none'; }, 4000);
+    }
+  </script>
+</body>
+</html>
