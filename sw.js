@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bdc-vault-v4.4.0';
+const CACHE_NAME = 'bdc-vault-v4.6.0';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -20,8 +20,15 @@ self.addEventListener('install', (event) => {
     caches.open(CACHE_NAME).then((cache) => {
       console.log('[Service Worker] Caching app shell...');
       return cache.addAll(ASSETS_TO_CACHE);
-    }).then(() => self.skipWaiting())
+    })
   );
+});
+
+// Skip waiting message listener
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.action === 'skipWaiting') {
+    self.skipWaiting();
+  }
 });
 
 // Activate Event
@@ -31,7 +38,7 @@ self.addEventListener('activate', (event) => {
       return Promise.all(
         keyList.map((key) => {
           if (key !== CACHE_NAME) {
-            console.log('[Service Worker] Removing old cache:', key);
+            console.log('[Service Worker] Purging obsolete cache:', key);
             return caches.delete(key);
           }
         })
