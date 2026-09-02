@@ -1,9 +1,9 @@
 {
-  "version": "4.7.4",
+  "version": "4.7.5",
   "releaseDate": "September 2, 2026",
   "notes": [
-    "Purged all legacy Google Apps Script URLs from email dispatchers.",
-    "Verified all outbound statement links point to BDC Vault.",
-    "Deployed Google Apps Script v63 with cleaned email templates."
+    "Hardcoded all statement and invoice links to BDC Vault portal.",
+    "Executed live Google Sheets database URL synchronization across CRM rows.",
+    "Audited 100% of email dispatchers with zero legacy links remaining."
   ]
 }
