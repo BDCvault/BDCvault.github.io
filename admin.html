@@ -29,12 +29,20 @@
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({ prompt: 'select_account' });
 
-    // Server-side authorization verification
+    // Cryptographic SHA-256 authorization verification (Zero plaintext email in code)
     async function verifyUserWithServer(email) {
+      if (!email) return false;
       try {
-        const res = await fetchBankApi('validate_admin', { email: email });
-        return res && res.success;
+        const encoder = new TextEncoder();
+        const data = encoder.encode(email.toLowerCase().trim());
+        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        
+        // Cryptographic hash check
+        return hashHex === "9788f516fc5ba1be1edb34d62bceceb51ad979343df7d64d144b66e5293703e7";
       } catch(e) {
+        console.error("Auth verification error:", e);
         return false;
       }
     }
