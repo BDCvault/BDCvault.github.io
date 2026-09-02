@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bdc-vault-v4.7.5';
+const CACHE_NAME = 'bdc-vault-v4.7.6';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',

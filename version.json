@@ -1,9 +1,9 @@
 {
-  "version": "4.7.5",
+  "version": "4.7.6",
   "releaseDate": "September 2, 2026",
   "notes": [
-    "Hardcoded all statement and invoice links to BDC Vault portal.",
-    "Executed live Google Sheets database URL synchronization across CRM rows.",
-    "Audited 100% of email dispatchers with zero legacy links remaining."
+    "Added Google Sign-In authentication for borrower portal.",
+    "Integrated Firebase Google Auth on login page.",
+    "Deployed Google Apps Script v65 with verified Google login."
   ]
 }

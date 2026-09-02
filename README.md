@@ -30,6 +30,7 @@
 
 | Version | Release Date | Summary of Features & Fixes |
 | :--- | :--- | :--- |
+| **`v4.7.6`** | Sep 2, 2026 | Added Google Sign-In authentication for borrower portal with Firebase. |
 | **`v4.7.5`** | Sep 2, 2026 | Hardcoded statement links to BDC Vault portal and synced Google Sheets CRM. |
 | **`v4.7.4`** | Sep 2, 2026 | Purged legacy Google Apps Script URLs from email dispatchers. |
 | **`v4.7.3`** | Sep 2, 2026 | Updated account statement templates with new portal URL. |
