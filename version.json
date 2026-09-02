@@ -1,0 +1,11 @@
+{
+  "version": "v4.7.0",
+  "releaseDate": "September 2, 2026",
+  "highlights": [
+    "Converted BDC Vault into an installable Web App.",
+    "Added live Borrower Directory to Executive Center.",
+    "Built ledger transaction editor with balance recalculations.",
+    "Enforced mandatory borrower password authentication.",
+    "Added App Store style live update alerts."
+  ]
+}

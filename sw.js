@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bdc-vault-v4.6.0';
+const CACHE_NAME = 'bdc-vault-v4.7.0';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -11,7 +11,8 @@ const ASSETS_TO_CACHE = [
   './app.js',
   './pwa.js',
   './icon.svg',
-  './manifest.json'
+  './manifest.json',
+  './version.json'
 ];
 
 // Install Event
