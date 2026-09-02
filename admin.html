@@ -303,6 +303,9 @@
         <button class="admin-tab-btn" onclick="switchAdminSection('tx', this)">
           💳 Post Transaction
         </button>
+        <button class="admin-tab-btn" onclick="switchAdminSection('accounts', this)">
+          👥 Borrower Accounts
+        </button>
         <button class="admin-tab-btn" onclick="switchAdminSection('emails', this)">
           📧 Email Suite
         </button>
@@ -365,7 +368,64 @@
         </div>
       </div>
 
-      <!-- SECTION 3: EMAIL SHOWCASE SUITE (PROTECTED BEHIND ADMIN AUTH) -->
+      <!-- SECTION 3: BORROWER ACCOUNTS & PASSWORDS -->
+      <div id="sectionAccounts" style="display:none;">
+        
+        <!-- CARD A: DIRECT SET PASSWORD -->
+        <div class="card" style="margin-bottom:20px;">
+          <h3 style="font-family:var(--font-heading); font-size:1.25rem; margin-bottom:8px; color:white;">⚡ Set / Change Borrower Password</h3>
+          <p style="color:var(--text-muted); font-size:0.88rem; margin-bottom:16px;">
+            Directly configure a password for any borrower so they can log in immediately.
+          </p>
+          <form onsubmit="handleAdminSetPassword(event)">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+              <div class="form-group">
+                <label>Borrower Email Address</label>
+                <input type="email" id="adminSetEmail" placeholder="e.g. borrower@example.com" required>
+              </div>
+              <div class="form-group">
+                <label>New Password</label>
+                <input type="text" id="adminSetNewPw" placeholder="e.g. Vault2026!" minlength="6" required>
+              </div>
+            </div>
+            <button type="submit" id="btnAdminSetPw" class="btn-primary" style="width:100%; margin-top:10px;">
+              🔑 Update Password in Database
+            </button>
+            <div id="adminSetPwStatus" style="text-align:center; margin-top:12px; font-weight:600; display:none;"></div>
+          </form>
+        </div>
+
+        <!-- CARD B: SEND EMAIL ACTIVATION INVITATION -->
+        <div class="card">
+          <h3 style="font-family:var(--font-heading); font-size:1.25rem; margin-bottom:8px; color:white;">✉️ Send Account Activation & Password Setup Email</h3>
+          <p style="color:var(--text-muted); font-size:0.88rem; margin-bottom:16px;">
+            Dispatches a branded BDC Vault invitation email with an encrypted 48-hour password setup link.
+          </p>
+          <form onsubmit="handleAdminSendInvite(event)">
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px;">
+              <div class="form-group">
+                <label>Borrower Name</label>
+                <input type="text" id="adminInviteName" placeholder="e.g. Crystal" required>
+              </div>
+              <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" id="adminInviteEmail" placeholder="e.g. crystal@example.com" required>
+              </div>
+              <div class="form-group">
+                <label>Starting Principal ($)</label>
+                <input type="number" id="adminInvitePrincipal" placeholder="e.g. 5000">
+              </div>
+            </div>
+            <button type="submit" id="btnAdminInvite" class="btn-primary" style="width:100%; margin-top:10px;">
+              📧 Dispatch Activation Email
+            </button>
+            <div id="adminInviteStatus" style="text-align:center; margin-top:12px; font-weight:600; display:none;"></div>
+          </form>
+        </div>
+
+      </div>
+
+      <!-- SECTION 4: EMAIL SHOWCASE SUITE (PROTECTED BEHIND ADMIN AUTH) -->
       <div id="sectionEmails" style="display:none;">
         <div class="card">
           <h3 style="font-family:var(--font-heading); font-size:1.25rem; margin-bottom:14px; color:white;">Official BDC Vault Email Suite</h3>
@@ -476,7 +536,77 @@
 
       document.getElementById('sectionOverview').style.display = (section === 'overview') ? 'block' : 'none';
       document.getElementById('sectionTx').style.display = (section === 'tx') ? 'block' : 'none';
+      document.getElementById('sectionAccounts').style.display = (section === 'accounts') ? 'block' : 'none';
       document.getElementById('sectionEmails').style.display = (section === 'emails') ? 'block' : 'none';
+    }
+
+    async function handleAdminSetPassword(e) {
+      e.preventDefault();
+      const email = document.getElementById('adminSetEmail').value.trim();
+      const newPassword = document.getElementById('adminSetNewPw').value;
+      const btn = document.getElementById('btnAdminSetPw');
+      const status = document.getElementById('adminSetPwStatus');
+
+      btn.disabled = true;
+      btn.innerText = 'Updating password...';
+      status.style.display = 'none';
+
+      try {
+        const res = await fetchBankApi('admin_set_password', { email: email, newPassword: newPassword });
+        btn.disabled = false;
+        btn.innerText = '🔑 Update Password in Database';
+        status.style.display = 'block';
+
+        if (res && res.success) {
+          status.style.color = '#34d399';
+          status.innerText = `✅ Password updated for ${email}! Borrower can log in now.`;
+          document.getElementById('adminSetNewPw').value = '';
+        } else {
+          status.style.color = '#fb7185';
+          status.innerText = `❌ ${res ? res.message : 'Error setting password.'}`;
+        }
+      } catch(err) {
+        btn.disabled = false;
+        btn.innerText = '🔑 Update Password in Database';
+        status.style.display = 'block';
+        status.style.color = '#fb7185';
+        status.innerText = '❌ Failed to connect to server.';
+      }
+    }
+
+    async function handleAdminSendInvite(e) {
+      e.preventDefault();
+      const clientName = document.getElementById('adminInviteName').value.trim();
+      const email = document.getElementById('adminInviteEmail').value.trim();
+      const principal = document.getElementById('adminInvitePrincipal').value;
+      const btn = document.getElementById('btnAdminInvite');
+      const status = document.getElementById('adminInviteStatus');
+
+      btn.disabled = true;
+      btn.innerText = 'Sending invitation email...';
+      status.style.display = 'none';
+
+      try {
+        const res = await fetchBankApi('admin_send_invite', { clientName: clientName, email: email, principal: principal });
+        btn.disabled = false;
+        btn.innerText = '📧 Dispatch Activation Email';
+        status.style.display = 'block';
+
+        if (res && res.success) {
+          status.style.color = '#34d399';
+          status.innerText = `✅ Setup email sent to ${email}! Link expires in 48 hours.`;
+          document.getElementById('adminInviteEmail').value = '';
+        } else {
+          status.style.color = '#fb7185';
+          status.innerText = `❌ ${res ? res.message : 'Error sending invite.'}`;
+        }
+      } catch(err) {
+        btn.disabled = false;
+        btn.innerText = '📧 Dispatch Activation Email';
+        status.style.display = 'block';
+        status.style.color = '#fb7185';
+        status.innerText = '❌ Failed to send invitation email.';
+      }
     }
 
     function switchEmailPreview(previewId, btn) {
