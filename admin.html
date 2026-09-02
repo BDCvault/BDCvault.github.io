@@ -166,12 +166,13 @@
     }
     .admin-nav-tabs {
       display: flex;
-      gap: 8px;
+      gap: 6px;
       background: rgba(15, 23, 42, 0.8);
       border: 1px solid var(--border-color);
       padding: 6px;
       border-radius: 14px;
       margin-bottom: 24px;
+      overflow-x: auto;
     }
     .admin-tab-btn {
       flex: 1;
@@ -189,6 +190,7 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
+      white-space: nowrap;
     }
     .admin-tab-btn.active {
       background: linear-gradient(135deg, rgba(168, 85, 247, 0.25), rgba(99, 102, 241, 0.25));
@@ -196,48 +198,69 @@
       border: 1px solid rgba(168, 85, 247, 0.4);
       box-shadow: 0 0 10px rgba(168, 85, 247, 0.2);
     }
-    .email-sub-tabs {
-      display: flex;
-      gap: 6px;
-      margin-bottom: 20px;
-      overflow-x: auto;
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.88rem;
     }
-    .email-sub-btn {
-      padding: 8px 12px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
+    .data-table th {
+      padding: 12px 10px;
       color: var(--text-muted);
-      font-size: 0.82rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .data-table td {
+      padding: 12px 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      color: #cbd5e1;
+    }
+    .data-table tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+    .action-btn-sm {
+      padding: 5px 10px;
+      border-radius: 8px;
+      font-size: 0.78rem;
       font-weight: 600;
       cursor: pointer;
-      white-space: nowrap;
+      border: none;
+      transition: all 0.2s;
     }
-    .email-sub-btn.active {
-      background: rgba(168, 85, 247, 0.2);
-      border-color: rgba(168, 85, 247, 0.5);
-      color: white;
-    }
-    .email-box {
-      background: #0f172a;
-      border: 1px solid var(--border-color);
-      border-radius: 16px;
+    .btn-edit { background: rgba(99, 102, 241, 0.18); color: #a5b4fc; border: 1px solid rgba(99, 102, 241, 0.3); }
+    .btn-edit:hover { background: rgba(99, 102, 241, 0.35); color: white; }
+    .btn-del { background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3); }
+    .btn-del:hover { background: rgba(239, 68, 68, 0.35); color: white; }
+    
+    /* Modal styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
       padding: 20px;
     }
-    .email-header-bar {
-      background: rgba(255, 255, 255, 0.05);
-      border-left: 3px solid var(--primary-purple);
-      padding: 10px 14px;
-      border-radius: 8px;
-      margin-bottom: 16px;
-      font-size: 0.85rem;
-      color: #cbd5e1;
+    .modal-box {
+      background: #0f172a;
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 28px;
+      max-width: 500px;
+      width: 100%;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
     }
   </style>
 </head>
 <body>
 
-  <div class="container" style="max-width:850px;">
+  <div class="container" style="max-width:920px;">
     
     <!-- NAVBAR -->
     <nav class="navbar">
@@ -298,20 +321,23 @@
       <!-- MAIN ADMIN NAVIGATION TABS -->
       <div class="admin-nav-tabs">
         <button class="admin-tab-btn active" onclick="switchAdminSection('overview', this)">
-          📊 Portfolio & Metrics
+          📊 Overview
         </button>
-        <button class="admin-tab-btn" onclick="switchAdminSection('tx', this)">
-          💳 Post Transaction
+        <button class="admin-tab-btn" onclick="switchAdminSection('borrowers', this)">
+          👥 Borrowers List
+        </button>
+        <button class="admin-tab-btn" onclick="switchAdminSection('ledger', this)">
+          📝 Ledger & Edit Tx
         </button>
         <button class="admin-tab-btn" onclick="switchAdminSection('accounts', this)">
-          👥 Borrower Accounts
+          🔑 Passwords & Setup
         </button>
         <button class="admin-tab-btn" onclick="switchAdminSection('emails', this)">
           📧 Email Suite
         </button>
       </div>
 
-      <!-- SECTION 1: PORTFOLIO & METRICS -->
+      <!-- SECTION 1: OVERVIEW -->
       <div id="sectionOverview">
         <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:16px; margin-bottom:24px;">
           <div class="card" style="padding:20px; margin:0;">
@@ -329,46 +355,113 @@
         </div>
 
         <div class="card">
-          <h3 style="font-family:var(--font-heading); font-size:1.25rem; margin-bottom:16px; color:white;">Recent Audit Trail</h3>
+          <h3 style="font-family:var(--font-heading); font-size:1.25rem; margin-bottom:16px; color:white;">Recent Global Activity</h3>
           <div id="adminActivityList">
             <div style="color:var(--text-muted); text-align:center;">Loading audit trail...</div>
           </div>
         </div>
       </div>
 
-      <!-- SECTION 2: TRANSACTION LOGGER -->
-      <div id="sectionTx" style="display:none;">
+      <!-- SECTION 2: BORROWERS DIRECTORY (LIST OF USERS) -->
+      <div id="sectionBorrowers" style="display:none;">
         <div class="card">
-          <h3 style="font-family:var(--font-heading); font-size:1.25rem; margin-bottom:16px; color:white;">Post Ledger Transaction</h3>
-          <form onsubmit="submitTransaction(event)">
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
-              <div class="form-group">
-                <label>Borrower Name</label>
-                <select id="clientSelect" required></select>
-              </div>
-              <div class="form-group">
-                <label>Type</label>
-                <select id="txType">
-                  <option value="Payment">Payment (- Balance)</option>
-                  <option value="Loan">Loan / Charge (+ Balance)</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label>Amount ($)</label>
-                <input type="number" step="0.01" id="txAmount" placeholder="e.g. 500" required>
-              </div>
-              <div class="form-group">
-                <label>Description / Note</label>
-                <input type="text" id="txDesc" placeholder="e.g. Settlement payment" required>
-              </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
+            <div>
+              <h3 style="font-family:var(--font-heading); font-size:1.3rem; color:white; margin-bottom:4px;">👥 Borrower Directory</h3>
+              <p style="color:var(--text-muted); font-size:0.85rem;">All active client accounts registered in BDC Vault.</p>
             </div>
-            <button type="submit" class="btn-primary" style="width:100%; margin-top:10px;">Post to Ledger</button>
-            <div id="txStatus" style="text-align:center; margin-top:10px; font-weight:600; display:none;"></div>
-          </form>
+            <button class="btn-primary" onclick="loadBorrowersDirectory()" style="padding:8px 16px; font-size:0.85rem;">🔄 Refresh</button>
+          </div>
+
+          <div style="overflow-x:auto;">
+            <table class="data-table" id="borrowerTable">
+              <thead>
+                <tr>
+                  <th>Borrower</th>
+                  <th>Email</th>
+                  <th>Current Balance</th>
+                  <th>Starting Principal</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="borrowerTableBody">
+                <tr><td colspan="6" style="text-align:center; padding:20px; color:var(--text-muted);">Loading borrower accounts...</td></tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
-      <!-- SECTION 3: BORROWER ACCOUNTS & PASSWORDS -->
+      <!-- SECTION 3: LEDGER & TRANSACTION EDITOR -->
+      <div id="sectionLedger" style="display:none;">
+        <div class="card" style="margin-bottom:20px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px;">
+            <div>
+              <h3 style="font-family:var(--font-heading); font-size:1.3rem; color:white; margin-bottom:4px;">📝 Ledger & Transaction Editor</h3>
+              <p style="color:var(--text-muted); font-size:0.85rem;">Select a borrower to inspect, edit, or delete ledger entries.</p>
+            </div>
+            <div style="display:flex; gap:10px; align-items:center;">
+              <select id="ledgerClientSelect" onchange="loadDetailedLedger()" style="padding:10px; background:#1e293b; color:white; border:1px solid var(--border-color); border-radius:10px; font-weight:600;"></select>
+              <button class="btn-primary" onclick="toggleAddTxForm()" style="padding:10px 16px; font-size:0.85rem;">➕ Post New Tx</button>
+            </div>
+          </div>
+
+          <!-- QUICK ADD TX FORM (COLLAPSIBLE) -->
+          <div id="quickAddTxBox" style="display:none; background:rgba(255,255,255,0.03); border:1px solid var(--border-color); border-radius:14px; padding:20px; margin-bottom:20px;">
+            <h4 style="color:white; margin-bottom:12px; font-size:1rem;">Post New Transaction</h4>
+            <form onsubmit="submitNewTransaction(event)">
+              <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:12px;">
+                <div class="form-group">
+                  <label>Date</label>
+                  <input type="date" id="newTxDate">
+                </div>
+                <div class="form-group">
+                  <label>Type</label>
+                  <select id="newTxType">
+                    <option value="Payment">Payment (- Balance)</option>
+                    <option value="Loan">Loan (+ Balance)</option>
+                    <option value="Interest">Interest (+ Balance)</option>
+                    <option value="Fee">Fee (+ Balance)</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Amount ($)</label>
+                  <input type="number" step="0.01" id="newTxAmount" placeholder="e.g. 250" required>
+                </div>
+                <div class="form-group">
+                  <label>Description</label>
+                  <input type="text" id="newTxDesc" placeholder="e.g. Cash App settlement" required>
+                </div>
+              </div>
+              <button type="submit" class="btn-primary" style="width:100%; margin-top:12px;">Post to Ledger ➔</button>
+              <div id="addTxStatus" style="text-align:center; margin-top:10px; font-weight:600; display:none;"></div>
+            </form>
+          </div>
+
+          <!-- DETAILED LEDGER TABLE -->
+          <div style="overflow-x:auto;">
+            <table class="data-table" id="detailedLedgerTable">
+              <thead>
+                <tr>
+                  <th>Row</th>
+                  <th>Date</th>
+                  <th>Type</th>
+                  <th>Description</th>
+                  <th>Amount</th>
+                  <th>Running Balance</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="detailedLedgerBody">
+                <tr><td colspan="7" style="text-align:center; padding:20px; color:var(--text-muted);">Select a borrower to view ledger.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 4: PASSWORDS & BORROWER SETUP -->
       <div id="sectionAccounts" style="display:none;">
         
         <!-- CARD A: DIRECT SET PASSWORD -->
@@ -425,7 +518,7 @@
 
       </div>
 
-      <!-- SECTION 4: EMAIL SHOWCASE SUITE (PROTECTED BEHIND ADMIN AUTH) -->
+      <!-- SECTION 5: EMAIL SHOWCASE SUITE -->
       <div id="sectionEmails" style="display:none;">
         <div class="card">
           <h3 style="font-family:var(--font-heading); font-size:1.25rem; margin-bottom:14px; color:white;">Official BDC Vault Email Suite</h3>
@@ -521,6 +614,45 @@
 
     </div>
 
+    <!-- EDIT TRANSACTION MODAL -->
+    <div id="editTxModal" class="modal-overlay" style="display:none;">
+      <div class="modal-box">
+        <h3 style="font-family:var(--font-heading); color:white; margin-bottom:6px;">✏️ Edit Transaction</h3>
+        <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:18px;">
+          Balances will be automatically recalculated after saving.
+        </p>
+        <form onsubmit="submitEditTransaction(event)">
+          <input type="hidden" id="editRowIndex">
+          <div class="form-group" style="margin-bottom:12px;">
+            <label>Date</label>
+            <input type="date" id="editDate" required>
+          </div>
+          <div class="form-group" style="margin-bottom:12px;">
+            <label>Type</label>
+            <select id="editType">
+              <option value="Payment">Payment (- Balance)</option>
+              <option value="Loan">Loan (+ Balance)</option>
+              <option value="Interest">Interest (+ Balance)</option>
+              <option value="Fee">Fee (+ Balance)</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom:12px;">
+            <label>Amount ($)</label>
+            <input type="number" step="0.01" id="editAmount" required>
+          </div>
+          <div class="form-group" style="margin-bottom:16px;">
+            <label>Description</label>
+            <input type="text" id="editDesc" required>
+          </div>
+          <div style="display:flex; gap:10px;">
+            <button type="submit" id="btnSaveEdit" class="btn-primary" style="flex:1;">Save Changes ➔</button>
+            <button type="button" onclick="closeEditModal()" style="background:rgba(255,255,255,0.08); color:white; border:1px solid var(--border-color); padding:10px 18px; border-radius:12px; font-weight:600; cursor:pointer;">Cancel</button>
+          </div>
+          <div id="editTxStatus" style="text-align:center; margin-top:10px; font-weight:600; display:none;"></div>
+        </form>
+      </div>
+    </div>
+
     <footer>
       BDC Vault &bull; Executive Command Center
     </footer>
@@ -530,16 +662,252 @@
   <script src="app.js"></script>
   <script src="pwa.js"></script>
   <script>
+    let cachedBorrowers = [];
+
     function switchAdminSection(section, btn) {
       document.querySelectorAll('.admin-tab-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
 
       document.getElementById('sectionOverview').style.display = (section === 'overview') ? 'block' : 'none';
-      document.getElementById('sectionTx').style.display = (section === 'tx') ? 'block' : 'none';
+      document.getElementById('sectionBorrowers').style.display = (section === 'borrowers') ? 'block' : 'none';
+      document.getElementById('sectionLedger').style.display = (section === 'ledger') ? 'block' : 'none';
       document.getElementById('sectionAccounts').style.display = (section === 'accounts') ? 'block' : 'none';
       document.getElementById('sectionEmails').style.display = (section === 'emails') ? 'block' : 'none';
+
+      if (section === 'borrowers') loadBorrowersDirectory();
+      if (section === 'ledger') loadDetailedLedger();
     }
 
+    function toggleAddTxForm() {
+      const box = document.getElementById('quickAddTxBox');
+      box.style.display = (box.style.display === 'none') ? 'block' : 'none';
+      if (!document.getElementById('newTxDate').value) {
+        document.getElementById('newTxDate').value = new Date().toISOString().split('T')[0];
+      }
+    }
+
+    // --- 1. BORROWERS DIRECTORY ---
+    async function loadBorrowersDirectory() {
+      const tbody = document.getElementById('borrowerTableBody');
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px; color:var(--text-muted);">Fetching borrower directory from master ledger...</td></tr>';
+      
+      try {
+        const borrowers = await fetchBankApi('borrowers') || [];
+        cachedBorrowers = borrowers;
+        
+        if (borrowers.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px; color:var(--text-muted);">No borrowers found.</td></tr>';
+          return;
+        }
+
+        let html = '';
+        borrowers.forEach(b => {
+          const statusColor = (b.status === 'ACTIVE') ? '#10b981' : '#f59e0b';
+          html += `
+            <tr>
+              <td><strong style="color:white;">${b.name}</strong></td>
+              <td>${b.email || '<span style="color:var(--text-muted)">None</span>'}</td>
+              <td style="font-family:var(--font-heading); font-weight:700; color:#fb7185;">${formatMoney(b.balance)}</td>
+              <td>${formatMoney(b.principal)}</td>
+              <td>
+                <span style="background:rgba(255,255,255,0.06); color:${statusColor}; border:1px solid ${statusColor}44; padding:3px 8px; border-radius:6px; font-size:0.75rem; font-weight:700;">
+                  ${b.status}
+                </span>
+              </td>
+              <td>
+                <div style="display:flex; gap:6px;">
+                  <button class="action-btn-sm btn-edit" onclick="openBorrowerLedger('${b.name}')">📝 Ledger</button>
+                  <button class="action-btn-sm btn-edit" onclick="prefillSetPassword('${b.email}')">🔑 Pw</button>
+                </div>
+              </td>
+            </tr>
+          `;
+        });
+        tbody.innerHTML = html;
+      } catch(e) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#fb7185; padding:20px;">Failed to load borrowers.</td></tr>';
+      }
+    }
+
+    function openBorrowerLedger(name) {
+      const select = document.getElementById('ledgerClientSelect');
+      select.value = name;
+      const tabBtn = document.querySelectorAll('.admin-tab-btn')[2];
+      switchAdminSection('ledger', tabBtn);
+      loadDetailedLedger();
+    }
+
+    function prefillSetPassword(email) {
+      document.getElementById('adminSetEmail').value = email;
+      const tabBtn = document.querySelectorAll('.admin-tab-btn')[3];
+      switchAdminSection('accounts', tabBtn);
+    }
+
+    // --- 2. DETAILED LEDGER & TRANSACTION EDITOR ---
+    async function loadDetailedLedger() {
+      const select = document.getElementById('ledgerClientSelect');
+      const client = select.value;
+      const tbody = document.getElementById('detailedLedgerBody');
+
+      if (!client) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:var(--text-muted);">Please select a borrower.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:var(--text-muted);">Loading ledger transactions...</td></tr>';
+
+      try {
+        const txs = await fetchBankApi('detailed_ledger', { client: client }) || [];
+        if (txs.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:var(--text-muted);">No transactions found for this borrower.</td></tr>';
+          return;
+        }
+
+        let html = '';
+        [...txs].reverse().forEach(tx => {
+          const typeColor = (tx.type === 'Payment') ? '#34d399' : '#fb7185';
+          const displayAmt = (tx.type === 'Payment') ? `-${formatMoney(tx.amount)}` : `+${formatMoney(tx.amount)}`;
+          html += `
+            <tr>
+              <td style="color:var(--text-muted); font-size:0.8rem;">#${tx.rowIndex}</td>
+              <td>${tx.date}</td>
+              <td><span style="font-weight:600; color:${typeColor}">${tx.type}</span></td>
+              <td><strong style="color:white;">${tx.description}</strong></td>
+              <td style="font-family:var(--font-heading); font-weight:700; color:${typeColor}">${displayAmt}</td>
+              <td style="font-family:var(--font-heading); font-weight:700; color:white;">${formatMoney(tx.balance)}</td>
+              <td>
+                <div style="display:flex; gap:6px;">
+                  <button class="action-btn-sm btn-edit" onclick="openEditModal(${tx.rowIndex}, '${tx.date}', '${tx.type}', '${encodeURIComponent(tx.description)}', ${tx.amount})">✏️ Edit</button>
+                  <button class="action-btn-sm btn-del" onclick="confirmDeleteTx('${client}', ${tx.rowIndex})">🗑️</button>
+                </div>
+              </td>
+            </tr>
+          `;
+        });
+        tbody.innerHTML = html;
+      } catch(e) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#fb7185; padding:20px;">Failed to load transactions.</td></tr>';
+      }
+    }
+
+    function openEditModal(rowIndex, date, type, descEncoded, amount) {
+      document.getElementById('editRowIndex').value = rowIndex;
+      document.getElementById('editDate').value = date;
+      document.getElementById('editType').value = type;
+      document.getElementById('editDesc').value = decodeURIComponent(descEncoded);
+      document.getElementById('editAmount').value = amount;
+      document.getElementById('editTxStatus').style.display = 'none';
+      document.getElementById('editTxModal').style.display = 'flex';
+    }
+
+    function closeEditModal() {
+      document.getElementById('editTxModal').style.display = 'none';
+    }
+
+    async function submitEditTransaction(e) {
+      e.preventDefault();
+      const client = document.getElementById('ledgerClientSelect').value;
+      const rowIndex = document.getElementById('editRowIndex').value;
+      const date = document.getElementById('editDate').value;
+      const type = document.getElementById('editType').value;
+      const desc = document.getElementById('editDesc').value;
+      const amount = document.getElementById('editAmount').value;
+      const btn = document.getElementById('btnSaveEdit');
+      const status = document.getElementById('editTxStatus');
+
+      btn.disabled = true;
+      btn.innerText = 'Recalculating ledger...';
+      status.style.display = 'none';
+
+      try {
+        const res = await fetchBankApi('edit_transaction', {
+          client: client,
+          rowIndex: rowIndex,
+          date: date,
+          type: type,
+          description: desc,
+          amount: amount
+        });
+
+        btn.disabled = false;
+        btn.innerText = 'Save Changes ➔';
+        
+        if (res && res.success) {
+          closeEditModal();
+          loadDetailedLedger();
+          loadDashboard();
+        } else {
+          status.style.display = 'block';
+          status.style.color = '#fb7185';
+          status.innerText = `❌ ${res ? res.message : 'Edit failed'}`;
+        }
+      } catch(err) {
+        btn.disabled = false;
+        btn.innerText = 'Save Changes ➔';
+        status.style.display = 'block';
+        status.style.color = '#fb7185';
+        status.innerText = '❌ Failed to connect to server.';
+      }
+    }
+
+    async function confirmDeleteTx(client, rowIndex) {
+      if (!confirm(`Are you sure you want to permanently delete transaction row #${rowIndex} for ${client}? All running balances will be automatically recalculated.`)) {
+        return;
+      }
+
+      try {
+        const res = await fetchBankApi('delete_transaction', { client: client, rowIndex: rowIndex });
+        if (res && res.success) {
+          loadDetailedLedger();
+          loadDashboard();
+        } else {
+          alert(`❌ Delete failed: ${res ? res.message : 'Unknown error'}`);
+        }
+      } catch(err) {
+        alert('❌ Error deleting transaction.');
+      }
+    }
+
+    async function submitNewTransaction(e) {
+      e.preventDefault();
+      const client = document.getElementById('ledgerClientSelect').value;
+      const date = document.getElementById('newTxDate').value;
+      const type = document.getElementById('newTxType').value;
+      const amount = document.getElementById('newTxAmount').value;
+      const desc = document.getElementById('newTxDesc').value;
+      const status = document.getElementById('addTxStatus');
+
+      status.style.display = 'block';
+      status.style.color = '#34d399';
+      status.innerText = '⏳ Posting to ledger and recalculating...';
+
+      try {
+        const res = await fetchBankApi('add_transaction', {
+          client: client,
+          type: type,
+          amount: amount,
+          description: desc,
+          date: date
+        });
+
+        if (res && res.success) {
+          status.innerText = '✅ Transaction posted successfully!';
+          document.getElementById('newTxAmount').value = '';
+          document.getElementById('newTxDesc').value = '';
+          setTimeout(() => { status.style.display = 'none'; }, 3000);
+          loadDetailedLedger();
+          loadDashboard();
+        } else {
+          status.style.color = '#fb7185';
+          status.innerText = `❌ ${res ? res.message : 'Error posting transaction'}`;
+        }
+      } catch(err) {
+        status.style.color = '#fb7185';
+        status.innerText = '❌ Failed to post transaction.';
+      }
+    }
+
+    // --- 3. PASSWORDS & ACCOUNTS ---
     async function handleAdminSetPassword(e) {
       e.preventDefault();
       const email = document.getElementById('adminSetEmail').value.trim();
@@ -630,6 +998,7 @@
       }
       
       loadDashboard();
+      loadBorrowersDirectory();
     }
 
     function showAuthError(msg) {
@@ -649,9 +1018,9 @@
         document.getElementById('statTotalClients').innerText = analytics.totalClients || 0;
       }
 
-      // 2. Fetch Clients
+      // 2. Fetch Clients into selector
       const clients = await fetchBankApi('clients') || ['Crystal'];
-      const select = document.getElementById('clientSelect');
+      const select = document.getElementById('ledgerClientSelect');
       select.innerHTML = '';
       clients.forEach(c => {
         const opt = document.createElement('option');
@@ -682,15 +1051,6 @@
         });
         actContainer.innerHTML = html;
       }
-    }
-
-    function submitTransaction(e) {
-      e.preventDefault();
-      const status = document.getElementById('txStatus');
-      status.style.display = 'block';
-      status.style.color = '#34d399';
-      status.innerText = '✅ Transaction queued and posted successfully!';
-      setTimeout(() => { status.style.display = 'none'; }, 4000);
     }
   </script>
 </body>
