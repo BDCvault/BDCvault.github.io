@@ -1,9 +1,9 @@
 {
-  "version": "4.7.8",
+  "version": "4.7.9",
   "releaseDate": "September 2, 2026",
   "notes": [
-    "Added live borrower accounts auto-loader to Executive Center.",
-    "Added 1-click email activation dispatcher for all database users.",
-    "Integrated auto-filling borrower selector for password and invite tools."
+    "Added live Auth Status badges across Borrower Directory and Accounts.",
+    "Integrated automatic 48-hour expiration calculation for invited accounts.",
+    "Deployed Google Apps Script v66 with enhanced status engine."
   ]
 }

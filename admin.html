@@ -489,11 +489,12 @@
                   <th>Email Address</th>
                   <th>Starting Principal</th>
                   <th>Current Balance</th>
+                  <th>Auth Status</th>
                   <th>Quick Actions</th>
                 </tr>
               </thead>
               <tbody id="borrowerAccountsTableBody">
-                <tr><td colspan="5" style="text-align:center; padding:20px; color:var(--text-muted);">Loading registered borrowers...</td></tr>
+                <tr><td colspan="6" style="text-align:center; padding:20px; color:var(--text-muted);">Loading registered borrowers...</td></tr>
               </tbody>
             </table>
           </div>
@@ -730,6 +731,17 @@
       }
     }
 
+    function getStatusBadge(status) {
+      const s = String(status || 'INVITED').toUpperCase();
+      if (s === 'ACTIVE') {
+        return `<span style="background:rgba(16,185,129,0.15); color:#34d399; border:1px solid rgba(16,185,129,0.35); padding:3px 8px; border-radius:6px; font-size:0.75rem; font-weight:700;">🟢 ACTIVE</span>`;
+      } else if (s === 'EXPIRED') {
+        return `<span style="background:rgba(239,68,68,0.15); color:#fca5a5; border:1px solid rgba(239,68,68,0.35); padding:3px 8px; border-radius:6px; font-size:0.75rem; font-weight:700;">🔴 EXPIRED</span>`;
+      } else {
+        return `<span style="background:rgba(245,158,11,0.15); color:#fbbf24; border:1px solid rgba(245,158,11,0.35); padding:3px 8px; border-radius:6px; font-size:0.75rem; font-weight:700;">🟡 INVITED</span>`;
+      }
+    }
+
     // --- 1. BORROWERS DIRECTORY ---
     async function loadBorrowersDirectory() {
       const tbody = document.getElementById('borrowerTableBody');
@@ -746,18 +758,13 @@
 
         let html = '';
         borrowers.forEach(b => {
-          const statusColor = (b.status === 'ACTIVE') ? '#10b981' : '#f59e0b';
           html += `
             <tr>
               <td><strong style="color:white;">${b.name}</strong></td>
               <td>${b.email || '<span style="color:var(--text-muted)">None</span>'}</td>
               <td style="font-family:var(--font-heading); font-weight:700; color:#fb7185;">${formatMoney(b.balance)}</td>
               <td>${formatMoney(b.principal)}</td>
-              <td>
-                <span style="background:rgba(255,255,255,0.06); color:${statusColor}; border:1px solid ${statusColor}44; padding:3px 8px; border-radius:6px; font-size:0.75rem; font-weight:700;">
-                  ${b.status}
-                </span>
-              </td>
+              <td>${getStatusBadge(b.status)}</td>
               <td>
                 <div style="display:flex; gap:6px;">
                   <button class="action-btn-sm btn-edit" onclick="openBorrowerLedger('${b.name}')">📝 Ledger</button>
@@ -984,6 +991,7 @@
               <td>${emailDisplay}</td>
               <td style="color:#94a3b8;">${formatMoney(b.principal)}</td>
               <td style="font-family:var(--font-heading); font-weight:700; color:#fb7185;">${formatMoney(b.balance)}</td>
+              <td>${getStatusBadge(b.status)}</td>
               <td>
                 <div style="display:flex; gap:6px; flex-wrap:wrap;">
                   <button class="action-btn-sm btn-edit" onclick="quickInviteBorrower('${b.name}', '${b.email || ''}', ${b.principal || 0})" style="background:rgba(168,85,247,0.2); color:#d8b4fe; border-color:rgba(168,85,247,0.4);">
@@ -999,7 +1007,7 @@
         });
         tbody.innerHTML = html;
       } catch(e) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#fb7185; padding:20px;">Failed to load borrowers from database.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#fb7185; padding:20px;">Failed to load borrowers from database.</td></tr>';
       }
     }
 
