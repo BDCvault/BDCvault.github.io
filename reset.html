@@ -2,8 +2,19 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BDC Loans | Password Setup</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>BDC Vault | Password Setup</title>
+  
+  <!-- PWA & Mobile Web App Meta -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="icon.svg">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <meta name="theme-color" content="#090d16">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="BDC Vault">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -30,7 +41,7 @@
       <a href="index.html" class="brand">
         <div class="brand-logo">💎</div>
         <div>
-          <div class="brand-title">BDC Loans</div>
+          <div class="brand-title">BDC Vault</div>
           <span class="brand-sub">Password Setup</span>
         </div>
       </a>
@@ -54,7 +65,7 @@
         </div>
 
         <button type="submit" class="btn-primary" id="saveBtn" style="width:100%; padding:15px; border-radius:12px; font-size:1rem;">
-          🔑 Save Password & Enter Portal
+          🔑 Save Password & Enter Vault
         </button>
 
         <div id="saveStatus" style="margin-top:16px; font-size:0.88rem; display:none;"></div>
@@ -63,6 +74,7 @@
   </div>
 
   <script src="app.js"></script>
+  <script src="pwa.js"></script>
   <script>
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get('token') || '';
@@ -87,15 +99,20 @@
       try {
         const res = await fetchBankApi('set_password', { token: token, password: pw });
         btn.disabled = false;
-        btn.innerText = "🔑 Save Password & Enter Portal";
+        btn.innerText = "🔑 Save Password & Enter Vault";
 
         if (res.success) {
+          sessionStorage.setItem('bdc_client_session', JSON.stringify({
+            clientName: res.clientName,
+            token: res.token || 'verified_active'
+          }));
+
           status.style.display = 'block';
           status.style.color = '#34d399';
-          status.innerText = "✅ Password saved! Redirecting...";
+          status.innerText = "✅ Password saved! Redirecting to statement...";
           setTimeout(() => {
-            window.location.href = "portal.html?client=" + encodeURIComponent(res.clientName);
-          }, 1200);
+            window.location.href = "portal.html";
+          }, 1000);
         } else {
           status.style.display = 'block';
           status.style.color = '#fb7185';
@@ -103,7 +120,7 @@
         }
       } catch(err) {
         btn.disabled = false;
-        btn.innerText = "🔑 Save Password & Enter Portal";
+        btn.innerText = "🔑 Save Password & Enter Vault";
         status.style.display = 'block';
         status.style.color = '#fb7185';
         status.innerText = "❌ Network error. Please try again.";

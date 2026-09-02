@@ -2,8 +2,19 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bank of Diva | Client Statement Portal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>BDC Vault | Client Statement Portal</title>
+  
+  <!-- PWA & Mobile Web App Meta -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="icon.svg">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <meta name="theme-color" content="#090d16">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="BDC Vault">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -19,7 +30,22 @@
     }
     .tx-item:last-child { border-bottom: none; }
     .tx-amount.Payment { color: #34d399; }
-    .tx-amount.Loan, .tx-amount.Interest { color: #fb7185; }
+    .tx-amount.Loan, .tx-amount.Interest, .tx-amount.Fee { color: #fb7185; }
+    .btn-signout {
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #fca5a5;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-signout:hover {
+      background: rgba(239, 68, 68, 0.25);
+      color: white;
+    }
   </style>
 </head>
 <body>
@@ -31,11 +57,13 @@
       <a href="index.html" class="brand">
         <div class="brand-logo">💎</div>
         <div>
-          <div class="brand-title">Bank of Diva</div>
+          <div class="brand-title">BDC Vault</div>
           <span class="brand-sub">Private Client Portal</span>
         </div>
       </a>
-      <a href="index.html" class="nav-link">Home ➔</a>
+      <div style="display:flex; gap:12px; align-items:center;">
+        <button class="btn-signout" onclick="clientSignOut()">🚪 Sign Out</button>
+      </div>
     </nav>
 
     <div id="loader" style="text-align:center; padding:40px; color:var(--primary-purple); font-weight:600;">
@@ -100,9 +128,31 @@
   </div>
 
   <script src="app.js"></script>
+  <script src="pwa.js"></script>
   <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const clientName = urlParams.get('client') || 'Client';
+    // 1. Enforce Mandatory Authentication
+    const sessionRaw = sessionStorage.getItem('bdc_client_session');
+    let authenticatedClient = null;
+
+    if (!sessionRaw) {
+      // Redirect unauthenticated visitor to login
+      window.location.replace('login.html?msg=unauthorized');
+    } else {
+      try {
+        const session = JSON.parse(sessionRaw);
+        authenticatedClient = session.clientName;
+        if (!authenticatedClient) {
+          window.location.replace('login.html?msg=unauthorized');
+        }
+      } catch(e) {
+        window.location.replace('login.html?msg=unauthorized');
+      }
+    }
+
+    function clientSignOut() {
+      sessionStorage.removeItem('bdc_client_session');
+      window.location.href = 'login.html';
+    }
 
     function downloadPDF() {
       const el = document.getElementById('portalContent');
@@ -111,7 +161,7 @@
 
       const opt = {
         margin: 0.4,
-        filename: `BankOfDiva_Statement_${clientName}.pdf`,
+        filename: `BDCVault_Statement_${authenticatedClient || 'Client'}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: { scale: 2, backgroundColor: '#090d16' },
         jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
@@ -123,11 +173,13 @@
     }
 
     window.onload = async function() {
-      document.getElementById('clientHeader').innerText = `Account Statement &bull; ${clientName}`;
+      if (!authenticatedClient) return;
+
+      document.getElementById('clientHeader').innerHTML = `Account Statement &bull; <strong>${authenticatedClient}</strong>`;
       document.getElementById('asOfDate').innerText = `As of ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
 
-      // Fetch live data from API
-      const data = await fetchBankApi('ledger', { client: clientName });
+      // Fetch live statement data from API
+      const data = await fetchBankApi('ledger', { client: authenticatedClient });
 
       document.getElementById('loader').style.display = 'none';
       document.getElementById('portalContent').style.display = 'block';

@@ -2,12 +2,55 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BDC Vault | Private Capital & Lending</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>BDC Vault | Private Lending & Capital</title>
+  
+  <!-- PWA & Mobile Web App Meta -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="icon.svg">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <meta name="theme-color" content="#090d16">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="BDC Vault">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+  <style>
+    .btn-pwa-install {
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(99, 102, 241, 0.2));
+      border: 1px solid rgba(168, 85, 247, 0.4);
+      color: #e2e8f0;
+      padding: 8px 16px;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .btn-pwa-install:hover {
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.35), rgba(99, 102, 241, 0.35));
+      color: white;
+      border-color: rgba(168, 85, 247, 0.7);
+    }
+    .auth-gate-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 32px 28px;
+      max-width: 540px;
+      margin: 0 auto;
+      text-align: center;
+      box-shadow: 0 20px 40px -10px rgba(0,0,0,0.5);
+    }
+  </style>
 </head>
 <body>
 
@@ -23,34 +66,40 @@
         </div>
       </a>
       <div class="nav-links">
+        <button class="btn-pwa-install" onclick="window.triggerPWAInstall()">📲 Install App</button>
         <a href="login.html" class="nav-link" style="color:#d8b4fe;">🔑 Borrower Sign In</a>
         <a href="admin.html" class="nav-link">🔒 Admin Center</a>
-        <a href="apply.html" class="btn-primary">Request Account</a>
       </div>
     </nav>
 
     <!-- HERO -->
     <div style="text-align:center; max-width:800px; margin: 40px auto 60px;">
       <div class="badge badge-due" style="margin-bottom:20px; font-size:0.85rem;">
-        💎 Official Private Client & Lending Portal
+        💎 Official Private Client & Lending Platform
       </div>
-      <h1 style="font-family:var(--font-heading); font-size:3.5rem; font-weight:800; line-height:1.15; margin-bottom:20px; letter-spacing:-1px;">
+      <h1 style="font-family:var(--font-heading); font-size:3.4rem; font-weight:800; line-height:1.15; margin-bottom:20px; letter-spacing:-1px;">
         Intelligent Personal Lending.<br>
         <span style="background:linear-gradient(135deg, #c084fc, #818cf8, #34d399); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">Secured by BDC Vault.</span>
       </h1>
       <p style="color:var(--text-muted); font-size:1.15rem; margin-bottom:40px;">
-        Access your real-time loan statements, track payoff progress, review automated interest, and make instant settlements with complete transparency.
+        Access your real-time loan statements, track payoff progress, review automated interest, and make instant settlements with complete confidentiality.
       </p>
 
-      <!-- SEARCH CARD -->
-      <div class="card" style="max-width:560px; margin:0 auto; text-align:left;">
-        <h3 style="font-family:var(--font-heading); font-size:1.3rem; margin-bottom:6px; color:white;">🔍 Access Your Client Portal</h3>
-        <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:20px;">Enter your client name below to securely view your live statement & ledger.</p>
-        
-        <form onsubmit="searchClientPortal(event)" style="display:flex; gap:10px;">
-          <input type="text" id="clientSearch" placeholder="e.g. Crystal, Jane Doe..." required style="flex:1;">
-          <button type="submit" class="btn-primary">View Statement ➔</button>
-        </form>
+      <!-- SECURE AUTHENTICATED ACCESS CARD (REPLACED PUBLIC SEARCH) -->
+      <div class="auth-gate-card">
+        <div style="font-size:32px; margin-bottom:8px;">🔒</div>
+        <h3 style="font-family:var(--font-heading); font-size:1.35rem; margin-bottom:8px; color:white;">Encrypted Borrower Access</h3>
+        <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:24px; line-height:1.5;">
+          All customer ledgers and statements are private. Sign in with your registered account credentials to view your personalized statement.
+        </p>
+        <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+          <a href="login.html" class="btn-primary" style="padding:14px 28px; text-decoration:none; font-size:0.95rem;">
+            🔑 Sign In to Your Vault ➔
+          </a>
+          <a href="apply.html" style="background:rgba(255,255,255,0.06); border:1px solid var(--border-color); color:white; padding:14px 22px; border-radius:12px; font-weight:600; text-decoration:none; font-size:0.95rem; display:inline-flex; align-items:center;">
+            Request Account
+          </a>
+        </div>
       </div>
     </div>
 
@@ -59,13 +108,13 @@
       <div class="card" style="padding:24px;">
         <div style="font-size:32px; margin-bottom:14px;">⚡</div>
         <h4 style="font-family:var(--font-heading); font-size:1.15rem; margin-bottom:8px; color:white;">Cash App & Venmo Sync</h4>
-        <p style="color:var(--text-muted); font-size:0.88rem;">Settle payments effortlessly via $BrianDivaCox or Venmo @BrianDivaCox with instant ledger recalculation.</p>
+        <p style="color:var(--text-muted); font-size:0.88rem;">Settle payments effortlessly via Cash App or Venmo with instant ledger recalculation.</p>
       </div>
 
       <div class="card" style="padding:24px;">
         <div style="font-size:32px; margin-bottom:14px;">📊</div>
         <h4 style="font-family:var(--font-heading); font-size:1.15rem; margin-bottom:8px; color:white;">Live Payoff Radar</h4>
-        <p style="color:var(--text-muted); font-size:0.88rem;">Interactive payoff progress meter with countdowns to the 11th payment deadline.</p>
+        <p style="color:var(--text-muted); font-size:0.88rem;">Interactive payoff progress meter with countdowns to monthly billing deadlines.</p>
       </div>
 
       <div class="card" style="padding:24px;">
@@ -89,13 +138,6 @@
   </div>
 
   <script src="app.js"></script>
-  <script>
-    function searchClientPortal(e) {
-      e.preventDefault();
-      const name = document.getElementById('clientSearch').value.trim();
-      if (!name) return;
-      window.location.href = 'portal.html?client=' + encodeURIComponent(name);
-    }
-  </script>
+  <script src="pwa.js"></script>
 </body>
 </html>
