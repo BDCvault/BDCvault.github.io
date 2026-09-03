@@ -30,6 +30,7 @@
 
 | Version | Release Date | Summary of Features & Fixes |
 | :--- | :--- | :--- |
+| **`v4.8.0`** | Sep 3, 2026 | Added 1-click Automated Financial Engines and 27.90% APR interest bot. |
 | **`v4.7.9`** | Sep 2, 2026 | Added live Auth Status badges and 48-hour expiration calculations. |
 | **`v4.7.8`** | Sep 2, 2026 | Added live borrower accounts auto-loader and 1-click invite dispatchers. |
 | **`v4.7.7`** | Sep 2, 2026 | Added custom GitHub Actions workflow with luxury branding. |

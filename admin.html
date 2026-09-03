@@ -359,6 +359,26 @@
           </div>
         </div>
 
+        <!-- AUTOMATED FINANCIAL ENGINES CARD -->
+        <div class="card" style="margin-bottom:24px;">
+          <h3 style="font-family:var(--font-heading); font-size:1.25rem; margin-bottom:8px; color:white;">⚡ Automated Financial Engines & Bots</h3>
+          <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:16px;">
+            Execute automated loan calculation routines on demand or rely on scheduled monthly trigger bots.
+          </p>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:12px;">
+            <button class="btn-primary" onclick="triggerMonthlyInterestEngine(this)" style="padding:12px; font-size:0.88rem; background:linear-gradient(135deg, #a855f7, #6366f1);">
+              📈 Run Monthly APR Interest
+            </button>
+            <button class="btn-primary" onclick="triggerLateFeeBot(this)" style="padding:12px; font-size:0.88rem; background:linear-gradient(135deg, #ef4444, #dc2626);">
+              ⚠️ Run $40 Late Fee Bot
+            </button>
+            <button class="btn-primary" onclick="triggerStatementBlaster(this)" style="padding:12px; font-size:0.88rem; background:linear-gradient(135deg, #10b981, #059669);">
+              📧 Blast Monthly Statements
+            </button>
+          </div>
+          <div id="botExecutionStatus" style="margin-top:14px; text-align:center; font-size:0.88rem; font-weight:600; display:none; padding:10px; border-radius:10px;"></div>
+        </div>
+
         <div class="card">
           <h3 style="font-family:var(--font-heading); font-size:1.25rem; margin-bottom:16px; color:white;">Recent Global Activity</h3>
           <div id="adminActivityList">
@@ -1119,6 +1139,105 @@
         status.style.display = 'block';
         status.style.color = '#fb7185';
         status.innerText = '❌ Failed to send invitation email.';
+      }
+    }
+
+    // --- 4. FINANCIAL ENGINES & BOT TRIGGERS ---
+    async function triggerMonthlyInterestEngine(btn) {
+      if (!confirm('📈 Run the Universal 27.90% APR Monthly Interest Engine on all active borrower accounts?')) return;
+      const status = document.getElementById('botExecutionStatus');
+      btn.disabled = true;
+      btn.innerText = 'Calculating interest...';
+      status.style.display = 'block';
+      status.style.background = 'rgba(168,85,247,0.15)';
+      status.style.color = '#d8b4fe';
+      status.innerText = '⏳ Calculating accrued interest and posting to ledgers...';
+
+      try {
+        const res = await fetchBankApi('apply_interest');
+        btn.disabled = false;
+        btn.innerText = '📈 Run Monthly APR Interest';
+        if (res && res.success) {
+          status.style.background = 'rgba(16,185,129,0.15)';
+          status.style.color = '#34d399';
+          status.innerText = `✅ ${res.message || 'Monthly interest applied successfully!'}`;
+          loadDashboard();
+        } else {
+          status.style.background = 'rgba(239,68,68,0.15)';
+          status.style.color = '#fb7185';
+          status.innerText = `❌ ${res ? res.message : 'Error running interest engine'}`;
+        }
+      } catch(err) {
+        btn.disabled = false;
+        btn.innerText = '📈 Run Monthly APR Interest';
+        status.style.background = 'rgba(239,68,68,0.15)';
+        status.style.color = '#fb7185';
+        status.innerText = '❌ Failed to connect to server.';
+      }
+    }
+
+    async function triggerLateFeeBot(btn) {
+      if (!confirm('⚠️ Run the $40 Monthly Late Fee Bot for accounts without qualifying payments before deadline?')) return;
+      const status = document.getElementById('botExecutionStatus');
+      btn.disabled = true;
+      btn.innerText = 'Evaluating late fees...';
+      status.style.display = 'block';
+      status.style.background = 'rgba(239,68,68,0.15)';
+      status.style.color = '#fca5a5';
+      status.innerText = '⏳ Checking payment deadlines and dispatching late notices...';
+
+      try {
+        const res = await fetchBankApi('apply_late_fees');
+        btn.disabled = false;
+        btn.innerText = '⚠️ Run $40 Late Fee Bot';
+        if (res && res.success) {
+          status.style.background = 'rgba(16,185,129,0.15)';
+          status.style.color = '#34d399';
+          status.innerText = '✅ $40 Late Fee Bot executed and audit logged.';
+          loadDashboard();
+        } else {
+          status.style.background = 'rgba(239,68,68,0.15)';
+          status.style.color = '#fb7185';
+          status.innerText = `❌ ${res ? res.message : 'Error running late fee bot'}`;
+        }
+      } catch(err) {
+        btn.disabled = false;
+        btn.innerText = '⚠️ Run $40 Late Fee Bot';
+        status.style.background = 'rgba(239,68,68,0.15)';
+        status.style.color = '#fb7185';
+        status.innerText = '❌ Failed to connect to server.';
+      }
+    }
+
+    async function triggerStatementBlaster(btn) {
+      if (!confirm('📧 Dispatch official monthly account statement emails to all active borrowers?')) return;
+      const status = document.getElementById('botExecutionStatus');
+      btn.disabled = true;
+      btn.innerText = 'Dispatching statements...';
+      status.style.display = 'block';
+      status.style.background = 'rgba(16,185,129,0.15)';
+      status.style.color = '#a7f3d0';
+      status.innerText = '⏳ Generating and sending branded HTML account statements...';
+
+      try {
+        const res = await fetchBankApi('send_monthly_statements');
+        btn.disabled = false;
+        btn.innerText = '📧 Blast Monthly Statements';
+        if (res && res.success) {
+          status.style.background = 'rgba(16,185,129,0.15)';
+          status.style.color = '#34d399';
+          status.innerText = '✅ Monthly statement blaster successfully dispatched!';
+        } else {
+          status.style.background = 'rgba(239,68,68,0.15)';
+          status.style.color = '#fb7185';
+          status.innerText = `❌ ${res ? res.message : 'Error sending statements'}`;
+        }
+      } catch(err) {
+        btn.disabled = false;
+        btn.innerText = '📧 Blast Monthly Statements';
+        status.style.background = 'rgba(239,68,68,0.15)';
+        status.style.color = '#fb7185';
+        status.innerText = '❌ Failed to connect to server.';
       }
     }
 

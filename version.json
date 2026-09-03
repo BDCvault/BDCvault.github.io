@@ -1,9 +1,9 @@
 {
-  "version": "4.7.9",
-  "releaseDate": "September 2, 2026",
+  "version": "4.8.0",
+  "releaseDate": "September 3, 2026",
   "notes": [
-    "Added live Auth Status badges across Borrower Directory and Accounts.",
-    "Integrated automatic 48-hour expiration calculation for invited accounts.",
-    "Deployed Google Apps Script v66 with enhanced status engine."
+    "Added 1-click Automated Financial Engines & Bots to Executive Center.",
+    "Integrated Universal 27.90% APR monthly interest calculation engine.",
+    "Deployed Google Apps Script v67 with live interest and bot endpoints."
   ]
 }
