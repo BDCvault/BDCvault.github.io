@@ -1,9 +1,9 @@
 {
-  "version": "4.9.2",
+  "version": "4.9.3",
   "releaseDate": "September 12, 2026",
   "notes": [
-    "Upgraded Firebase Google Authentication with seamless redirect fallback.",
-    "Integrated getRedirectResult handler for popup-blocked and mobile environments.",
-    "Removed static PIN inputs for pure OAuth 2.0 biometric security."
+    "Removed loan phrasing from monthly statement email notifications.",
+    "Updated account activation emails with clean statement copy.",
+    "Refreshed monthly statement email previews in Executive Center."
   ]
 }

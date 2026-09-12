@@ -30,6 +30,7 @@
 
 | Version | Release Date | Summary of Features & Fixes |
 | :--- | :--- | :--- |
+| **`v4.9.3`** | Sep 12, 2026 | Removed loan phrasing from monthly statement email templates and previews. |
 | **`v4.9.2`** | Sep 12, 2026 | Upgraded Firebase Google Auth with seamless redirect and popup fallbacks. |
 | **`v4.9.1`** | Sep 12, 2026 | Added Executive PIN login fallback and session auto-persistence. |
 | **`v4.9.0`** | Sep 12, 2026 | Added per-account APR interest toggle switches across Executive Center. |
