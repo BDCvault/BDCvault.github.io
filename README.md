@@ -30,6 +30,7 @@
 
 | Version | Release Date | Summary of Features & Fixes |
 | :--- | :--- | :--- |
+| **`v4.9.1`** | Sep 12, 2026 | Added Executive PIN login fallback and session auto-persistence. |
 | **`v4.9.0`** | Sep 12, 2026 | Added per-account APR interest toggle switches across Executive Center. |
 | **`v4.8.0`** | Sep 3, 2026 | Added 1-click Automated Financial Engines and 27.90% APR interest bot. |
 | **`v4.7.9`** | Sep 2, 2026 | Added live Auth Status badges and 48-hour expiration calculations. |

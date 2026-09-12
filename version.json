@@ -1,9 +1,9 @@
 {
-  "version": "4.9.0",
+  "version": "4.9.1",
   "releaseDate": "September 12, 2026",
   "notes": [
-    "Added per-account 27.90% APR interest toggle switches across Executive Center.",
-    "Integrated borrower-level interest calculation bypass in monthly billing engine.",
-    "Deployed Google Apps Script v68 with live toggle endpoints."
+    "Added dual Executive PIN & Google Sign-In authentication in Executive Center.",
+    "Added automatic session persistence across page reloads and tab closures.",
+    "Integrated detailed Firebase error diagnostics with instant PIN fallback."
   ]
 }
