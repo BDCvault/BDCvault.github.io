@@ -1,9 +1,9 @@
 {
-  "version": "4.9.1",
+  "version": "4.9.2",
   "releaseDate": "September 12, 2026",
   "notes": [
-    "Added dual Executive PIN & Google Sign-In authentication in Executive Center.",
-    "Added automatic session persistence across page reloads and tab closures.",
-    "Integrated detailed Firebase error diagnostics with instant PIN fallback."
+    "Upgraded Firebase Google Authentication with seamless redirect fallback.",
+    "Integrated getRedirectResult handler for popup-blocked and mobile environments.",
+    "Removed static PIN inputs for pure OAuth 2.0 biometric security."
   ]
 }
