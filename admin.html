@@ -235,6 +235,50 @@
     .btn-del { background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3); }
     .btn-del:hover { background: rgba(239, 68, 68, 0.35); color: white; }
     
+    /* Luxury Fintech Toggle Switch */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 40px;
+      height: 22px;
+      vertical-align: middle;
+    }
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: rgba(255, 255, 255, 0.12);
+      transition: .3s;
+      border-radius: 22px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 2px;
+      bottom: 2px;
+      background-color: #cbd5e1;
+      transition: .3s;
+      border-radius: 50%;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+    }
+    input:checked + .slider {
+      background: linear-gradient(135deg, #a855f7, #6366f1);
+      border-color: rgba(168, 85, 247, 0.5);
+      box-shadow: 0 0 10px rgba(168, 85, 247, 0.4);
+    }
+    input:checked + .slider:before {
+      transform: translateX(18px);
+      background-color: #ffffff;
+    }
+    
     /* Modal styles */
     .modal-overlay {
       position: fixed;
@@ -407,11 +451,12 @@
                   <th>Current Balance</th>
                   <th>Starting Principal</th>
                   <th>Status</th>
+                  <th>27.90% APR</th>
                   <th>Actions</th>
                 </tr>
               </thead>
               <tbody id="borrowerTableBody">
-                <tr><td colspan="6" style="text-align:center; padding:20px; color:var(--text-muted);">Loading borrower accounts...</td></tr>
+                <tr><td colspan="7" style="text-align:center; padding:20px; color:var(--text-muted);">Loading borrower accounts...</td></tr>
               </tbody>
             </table>
           </div>
@@ -426,8 +471,9 @@
               <h3 style="font-family:var(--font-heading); font-size:1.3rem; color:white; margin-bottom:4px;">📝 Ledger & Transaction Editor</h3>
               <p style="color:var(--text-muted); font-size:0.85rem;">Select a borrower to inspect, edit, or delete ledger entries.</p>
             </div>
-            <div style="display:flex; gap:10px; align-items:center;">
+            <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
               <select id="ledgerClientSelect" onchange="loadDetailedLedger()" style="padding:10px; background:#1e293b; color:white; border:1px solid var(--border-color); border-radius:10px; font-weight:600;"></select>
+              <div id="ledgerInterestStatusBox" style="display:flex; align-items:center; gap:8px;"></div>
               <button class="btn-primary" onclick="toggleAddTxForm()" style="padding:10px 16px; font-size:0.85rem;">➕ Post New Tx</button>
             </div>
           </div>
@@ -510,11 +556,12 @@
                   <th>Starting Principal</th>
                   <th>Current Balance</th>
                   <th>Auth Status</th>
+                  <th>27.90% APR</th>
                   <th>Quick Actions</th>
                 </tr>
               </thead>
               <tbody id="borrowerAccountsTableBody">
-                <tr><td colspan="6" style="text-align:center; padding:20px; color:var(--text-muted);">Loading registered borrowers...</td></tr>
+                <tr><td colspan="7" style="text-align:center; padding:20px; color:var(--text-muted);">Loading registered borrowers...</td></tr>
               </tbody>
             </table>
           </div>
@@ -762,17 +809,93 @@
       }
     }
 
+    function renderInterestToggle(clientName, isEnabled) {
+      const cleanId = 'tog_' + clientName.replace(/[^a-zA-Z0-9]/g, '_');
+      const checked = (isEnabled !== false);
+      return `
+        <div style="display:inline-flex; align-items:center; gap:8px;">
+          <label class="switch" title="Toggle 27.90% APR Monthly Interest">
+            <input type="checkbox" id="${cleanId}" ${checked ? 'checked' : ''} onchange="toggleClientInterest('${clientName}', this.checked, this)">
+            <span class="slider"></span>
+          </label>
+          <span id="label_${cleanId}" style="font-size:0.75rem; font-weight:700; color:${checked ? '#34d399' : '#94a3b8'}; width:28px;">
+            ${checked ? 'ON' : 'OFF'}
+          </span>
+        </div>
+      `;
+    }
+
+    async function toggleClientInterest(clientName, isEnabled, element) {
+      const cleanId = 'tog_' + clientName.replace(/[^a-zA-Z0-9]/g, '_');
+      const label = document.getElementById(`label_${cleanId}`);
+      if (label) {
+        label.innerText = isEnabled ? 'ON' : 'OFF';
+        label.style.color = isEnabled ? '#34d399' : '#94a3b8';
+      }
+      
+      const cached = cachedBorrowers.find(b => b.name === clientName);
+      if (cached) {
+        cached.interestEnabled = isEnabled;
+      }
+
+      try {
+        const res = await fetchBankApi('toggle_borrower_interest', { client: clientName, enabled: isEnabled });
+        if (res && res.success) {
+          updateLedgerInterestBadge(clientName, isEnabled);
+          // Sync any other matching toggles for this client on the page
+          document.querySelectorAll(`input[id$="${cleanId}"]`).forEach(inp => inp.checked = isEnabled);
+        } else {
+          alert(`❌ Failed to update interest setting: ${res ? res.message : 'Error'}`);
+          if (element) element.checked = !isEnabled;
+          if (label) {
+            label.innerText = !isEnabled ? 'ON' : 'OFF';
+            label.style.color = !isEnabled ? '#34d399' : '#94a3b8';
+          }
+        }
+      } catch (err) {
+        alert('❌ Failed to connect to server.');
+        if (element) element.checked = !isEnabled;
+        if (label) {
+          label.innerText = !isEnabled ? 'ON' : 'OFF';
+          label.style.color = !isEnabled ? '#34d399' : '#94a3b8';
+        }
+      }
+    }
+
+    function updateLedgerInterestBadge(clientName, isEnabled) {
+      const container = document.getElementById('ledgerInterestStatusBox');
+      if (!container) return;
+      if (!clientName) {
+        container.innerHTML = '';
+        return;
+      }
+      const checked = (isEnabled !== false);
+      const cleanId = 'ledger_tog_' + clientName.replace(/[^a-zA-Z0-9]/g, '_');
+      container.innerHTML = `
+        <div style="background:rgba(15,23,42,0.8); border:1px solid var(--border-color); padding:6px 12px; border-radius:10px; display:inline-flex; align-items:center; gap:8px; font-size:0.82rem;">
+          <span style="color:var(--text-muted); font-weight:600;">27.90% APR:</span>
+          <label class="switch" title="Toggle 27.90% APR Interest for ${clientName}">
+            <input type="checkbox" id="${cleanId}" ${checked ? 'checked' : ''} onchange="toggleClientInterest('${clientName}', this.checked, this)">
+            <span class="slider"></span>
+          </label>
+          <span id="label_${cleanId}" style="font-weight:700; color:${checked ? '#34d399' : '#94a3b8'};">
+            ${checked ? '🟢 Active' : '⚪ Paused'}
+          </span>
+        </div>
+      `;
+    }
+
     // --- 1. BORROWERS DIRECTORY ---
     async function loadBorrowersDirectory() {
       const tbody = document.getElementById('borrowerTableBody');
-      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px; color:var(--text-muted);">Fetching borrower directory from master ledger...</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:var(--text-muted);">Fetching borrower directory from master ledger...</td></tr>';
       
       try {
         const borrowers = await fetchBankApi('borrowers') || [];
         cachedBorrowers = borrowers;
         
         if (borrowers.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px; color:var(--text-muted);">No borrowers found.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:var(--text-muted);">No borrowers found.</td></tr>';
           return;
         }
 
@@ -785,6 +908,7 @@
               <td style="font-family:var(--font-heading); font-weight:700; color:#fb7185;">${formatMoney(b.balance)}</td>
               <td>${formatMoney(b.principal)}</td>
               <td>${getStatusBadge(b.status)}</td>
+              <td>${renderInterestToggle(b.name, b.interestEnabled)}</td>
               <td>
                 <div style="display:flex; gap:6px;">
                   <button class="action-btn-sm btn-edit" onclick="openBorrowerLedger('${b.name}')">📝 Ledger</button>
@@ -796,7 +920,7 @@
         });
         tbody.innerHTML = html;
       } catch(e) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#fb7185; padding:20px;">Failed to load borrowers.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#fb7185; padding:20px;">Failed to load borrowers.</td></tr>';
       }
     }
 
@@ -822,8 +946,12 @@
 
       if (!client) {
         tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:var(--text-muted);">Please select a borrower.</td></tr>';
+        updateLedgerInterestBadge(null, false);
         return;
       }
+
+      const bMatch = cachedBorrowers.find(x => x.name === client);
+      updateLedgerInterestBadge(client, bMatch ? bMatch.interestEnabled : true);
 
       tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:var(--text-muted);">Loading ledger transactions...</td></tr>';
 
@@ -982,7 +1110,7 @@
     async function loadBorrowerAccountsList() {
       const tbody = document.getElementById('borrowerAccountsTableBody');
       const select = document.getElementById('accountBorrowerSelect');
-      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px; color:var(--text-muted);">Loading registered borrowers...</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:var(--text-muted);">Loading registered borrowers...</td></tr>';
       
       try {
         const borrowers = cachedBorrowers.length ? cachedBorrowers : (await fetchBankApi('borrowers') || []);
@@ -998,7 +1126,7 @@
         });
 
         if (borrowers.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px; color:var(--text-muted);">No borrowers found in database.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:var(--text-muted);">No borrowers found in database.</td></tr>';
           return;
         }
 
@@ -1012,6 +1140,7 @@
               <td style="color:#94a3b8;">${formatMoney(b.principal)}</td>
               <td style="font-family:var(--font-heading); font-weight:700; color:#fb7185;">${formatMoney(b.balance)}</td>
               <td>${getStatusBadge(b.status)}</td>
+              <td>${renderInterestToggle(b.name, b.interestEnabled)}</td>
               <td>
                 <div style="display:flex; gap:6px; flex-wrap:wrap;">
                   <button class="action-btn-sm btn-edit" onclick="quickInviteBorrower('${b.name}', '${b.email || ''}', ${b.principal || 0})" style="background:rgba(168,85,247,0.2); color:#d8b4fe; border-color:rgba(168,85,247,0.4);">
@@ -1027,7 +1156,7 @@
         });
         tbody.innerHTML = html;
       } catch(e) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#fb7185; padding:20px;">Failed to load borrowers from database.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#fb7185; padding:20px;">Failed to load borrowers from database.</td></tr>';
       }
     }
 
