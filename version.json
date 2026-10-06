@@ -1,9 +1,10 @@
 {
-  "version": "4.9.4",
-  "releaseDate": "October 5, 2026",
+  "version": "4.9.5",
+  "releaseDate": "October 6, 2026",
   "notes": [
-    "Added interactive Bill and Debt Due Date Tracker Dashboard.",
+    "Added 4-category Bill & Debt Due Date Tracker Dashboard.",
     "Integrated interactive paid checkboxes with monthly auto-reset engine.",
-    "Deployed live side-by-side tables, timeline views, and calculations."
+    "Added live due-date countdown badges and timeline schedule view.",
+    "Deployed live Google Apps Script Web App version 11."
   ]
 }

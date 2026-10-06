@@ -50,10 +50,15 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    body {
+    html, body {
       background-color: var(--bg);
       color: var(--text-main);
       min-height: 100vh;
+      width: 100%;
+      overflow-x: hidden;
+    }
+
+    body {
       padding: 24px;
       display: flex;
       flex-direction: column;
@@ -62,7 +67,7 @@
 
     .app-container {
       width: 100%;
-      max-width: 1360px;
+      max-width: 1400px;
       display: flex;
       flex-direction: column;
       gap: 20px;
@@ -73,7 +78,7 @@
       background: var(--surface);
       border: 1px solid var(--surface-border);
       border-radius: var(--card-radius);
-      padding: 20px 24px;
+      padding: 18px 24px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -133,6 +138,7 @@
       display: flex;
       align-items: center;
       gap: 10px;
+      flex-wrap: wrap;
     }
 
     .btn {
@@ -146,6 +152,7 @@
       cursor: pointer;
       border: 1px solid transparent;
       transition: all 0.18s ease;
+      text-decoration: none;
     }
 
     .btn-primary {
@@ -167,10 +174,10 @@
       background: #f1f5f9;
     }
 
-    /* KPI METRICS BAR */
+    /* KPI METRICS GRID */
     .kpi-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
       gap: 16px;
     }
 
@@ -178,12 +185,10 @@
       background: var(--surface);
       border: 1px solid var(--surface-border);
       border-radius: var(--card-radius);
-      padding: 18px 22px;
+      padding: 18px 20px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      position: relative;
-      overflow: hidden;
       box-shadow: var(--shadow-sm);
     }
 
@@ -201,7 +206,7 @@
     }
 
     .kpi-label {
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.5px;
@@ -210,18 +215,15 @@
 
     .loan-card .kpi-label {
       color: #38bdf8;
-      display: flex;
-      align-items: center;
-      gap: 5px;
     }
 
     .kpi-badge-count {
-      width: 24px;
-      height: 24px;
+      width: 22px;
+      height: 22px;
       border-radius: 50%;
       background: var(--blue-light);
       color: var(--blue-primary);
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 700;
       display: flex;
       align-items: center;
@@ -229,13 +231,13 @@
     }
 
     .kpi-value {
-      font-size: 28px;
+      font-size: 26px;
       font-weight: 800;
       letter-spacing: -0.5px;
     }
 
     .kpi-footer {
-      font-size: 12px;
+      font-size: 11px;
       color: var(--text-muted);
       margin-top: 6px;
       display: flex;
@@ -323,11 +325,11 @@
       font-size: 14px;
     }
 
-    /* 3 MAIN TABLES / CARDS */
+    /* 4 MAIN CATEGORY CARDS SIDE-BY-SIDE */
     .tables-container {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+      gap: 18px;
       align-items: start;
     }
 
@@ -335,7 +337,7 @@
       background: var(--surface);
       border: 1px solid var(--surface-border);
       border-radius: var(--card-radius);
-      padding: 20px;
+      padding: 18px;
       box-shadow: var(--shadow-sm);
       display: flex;
       flex-direction: column;
@@ -365,18 +367,18 @@
     .dot-loans { background: var(--purple-primary); }
 
     .card-title {
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 700;
     }
 
     .card-active-count {
-      font-size: 12px;
+      font-size: 11px;
       color: var(--text-muted);
       font-weight: 500;
     }
 
     .card-header-badge {
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 700;
       padding: 3px 8px;
       border-radius: 6px;
@@ -395,7 +397,7 @@
     }
 
     .items-list::-webkit-scrollbar {
-      width: 5px;
+      width: 4px;
     }
     .items-list::-webkit-scrollbar-thumb {
       background: #cbd5e1;
@@ -406,8 +408,8 @@
       display: grid;
       grid-template-columns: auto 1fr auto auto;
       align-items: center;
-      gap: 12px;
-      padding: 10px 12px;
+      gap: 10px;
+      padding: 9px 10px;
       border-radius: 10px;
       background: #f8fafc;
       border: 1px solid transparent;
@@ -439,10 +441,10 @@
 
     .custom-check {
       appearance: none;
-      width: 20px;
-      height: 20px;
+      width: 18px;
+      height: 18px;
       border: 2px solid #94a3b8;
-      border-radius: 6px;
+      border-radius: 5px;
       background: #ffffff;
       cursor: pointer;
       position: relative;
@@ -461,28 +463,32 @@
       left: 50%;
       transform: translate(-50%, -50%);
       color: white;
-      font-size: 13px;
+      font-size: 11px;
       font-weight: 800;
     }
 
     .item-name-block {
       display: flex;
       flex-direction: column;
+      overflow: hidden;
     }
 
     .item-name {
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 600;
       color: var(--text-main);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .due-badge {
       display: inline-flex;
       align-items: center;
-      gap: 4px;
-      padding: 3px 8px;
+      gap: 3px;
+      padding: 2px 6px;
       border-radius: 6px;
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 700;
       background: var(--blue-light);
       color: var(--blue-primary);
@@ -493,13 +499,6 @@
       background: var(--coral-light);
       color: var(--coral-urgent);
       border: 1px solid var(--coral-border);
-      animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.02); }
-      100% { transform: scale(1); }
     }
 
     .due-badge.soon {
@@ -513,36 +512,36 @@
     }
 
     .item-amount {
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 700;
       color: var(--text-main);
       text-align: right;
-      min-width: 65px;
+      min-width: 55px;
     }
 
     .item-amount.unset {
       color: var(--text-subtle);
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 500;
     }
 
     /* CARD FOOTER */
     .card-footer {
       border-top: 1px solid var(--surface-border);
-      padding-top: 12px;
+      padding-top: 10px;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
 
     .footer-label {
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 600;
       color: var(--text-muted);
     }
 
     .footer-total {
-      font-size: 18px;
+      font-size: 16px;
       font-weight: 800;
       color: var(--text-main);
     }
@@ -555,7 +554,7 @@
       background: var(--surface);
       border: 1px solid var(--surface-border);
       border-radius: var(--card-radius);
-      padding: 24px;
+      padding: 20px;
       box-shadow: var(--shadow-sm);
     }
 
@@ -582,12 +581,7 @@
       opacity: 1;
     }
 
-    /* RESPONSIVE */
-    html, body {
-      overflow-x: hidden;
-      width: 100%;
-    }
-
+    /* RESPONSIVE AUDIT */
     @media (max-width: 768px) {
       body { padding: 10px; }
       .app-container { width: 100%; max-width: 100%; }
@@ -595,17 +589,17 @@
       .header-titles h1 { font-size: 17px; }
       .kpi-grid { grid-template-columns: 1fr; gap: 10px; }
       .kpi-card { padding: 14px 16px; }
-      .kpi-value { font-size: 24px; }
+      .kpi-value { font-size: 22px; }
       .tables-container { grid-template-columns: 1fr; gap: 14px; }
       .table-card { padding: 14px 12px; }
       .controls-bar { flex-direction: column; align-items: stretch; padding: 12px; }
       .view-toggles, .sort-toggles { flex-wrap: wrap; justify-content: flex-start; }
       .toggle-btn { padding: 5px 8px; font-size: 11px; }
       .search-input-wrap { max-width: 100%; }
-      .item-row { gap: 6px; padding: 8px 8px; font-size: 13px; }
-      .item-name { font-size: 13px; word-break: break-word; }
-      .due-badge { font-size: 10px; padding: 2px 5px; }
-      .item-amount { font-size: 13px; min-width: 50px; }
+      .item-row { gap: 6px; padding: 8px 8px; font-size: 12px; }
+      .item-name { font-size: 12px; word-break: break-word; }
+      .due-badge { font-size: 9px; padding: 2px 4px; }
+      .item-amount { font-size: 12px; min-width: 45px; }
     }
   </style>
 </head>
@@ -637,7 +631,7 @@
       <div class="kpi-card loan-card">
         <div class="kpi-top">
           <span class="kpi-label">⚡ Active Loan</span>
-          <span style="font-size: 11px; background: rgba(56,189,248,0.2); color: #38bdf8; padding: 2px 8px; border-radius: 6px; font-weight: 700;">ACTIVE</span>
+          <span style="font-size: 10px; background: rgba(56,189,248,0.2); color: #38bdf8; padding: 2px 6px; border-radius: 4px; font-weight: 700;">ACTIVE</span>
         </div>
         <div class="kpi-value" id="kpiLoanTotal">$512.03</div>
         <div class="kpi-footer">Payoff Target: Oct 9, 2026</div>
@@ -669,6 +663,15 @@
         <div class="kpi-value" id="kpiYearlyTotal">$93.99</div>
         <div class="kpi-footer">Tracked separately</div>
       </div>
+
+      <div class="kpi-card">
+        <div class="kpi-top">
+          <span class="kpi-label">Total Monthly Obligation</span>
+          <span class="kpi-badge-count" style="background:#fef3c7; color:#b45309;" id="kpiTotalCount">17</span>
+        </div>
+        <div class="kpi-value" style="color: #7c3aed;" id="kpiGrandTotal">$1,283.30</div>
+        <div class="kpi-footer">Combined monthly total</div>
+      </div>
     </section>
 
     <!-- CONTROLS & FILTER BAR -->
@@ -694,7 +697,7 @@
     <!-- SIDE-BY-SIDE TABLES VIEW -->
     <main class="tables-container" id="sideBySideView">
       
-      <!-- CARD 1: DEBT 6221 -->
+      <!-- CARD 1: DEBT 6221 (Cols A-D) -->
       <div class="table-card">
         <div class="card-header-row">
           <div class="card-title-group">
@@ -702,7 +705,7 @@
             <h2 class="card-title">Debt 6221</h2>
             <span class="card-active-count" id="debtHeaderCount">7 active entries</span>
           </div>
-          <span class="card-header-badge">↓ Due Date (1st – 31st)</span>
+          <span class="card-header-badge">↓ Col A–D</span>
         </div>
         <div class="items-list" id="debtList"></div>
         <div class="card-footer">
@@ -711,7 +714,7 @@
         </div>
       </div>
 
-      <!-- CARD 2: BILLS - 1539 -->
+      <!-- CARD 2: BILLS - 1539 (Cols E-H) -->
       <div class="table-card">
         <div class="card-header-row">
           <div class="card-title-group">
@@ -719,7 +722,7 @@
             <h2 class="card-title">Bills - 1539</h2>
             <span class="card-active-count" id="billsHeaderCount">8 active bills</span>
           </div>
-          <span class="card-header-badge" style="background: var(--green-light); color: var(--green-primary);">↓ Due Date (1st – 31st)</span>
+          <span class="card-header-badge" style="background: var(--green-light); color: var(--green-primary);">↓ Col E–H</span>
         </div>
         <div class="items-list" id="billsList"></div>
         <div class="card-footer">
@@ -728,7 +731,7 @@
         </div>
       </div>
 
-      <!-- CARD 3: YEARLY BILLS -->
+      <!-- CARD 3: YEARLY BILLS (Cols I-L) -->
       <div class="table-card">
         <div class="card-header-row">
           <div class="card-title-group">
@@ -736,7 +739,7 @@
             <h2 class="card-title">Yearly Bills</h2>
             <span class="card-active-count" id="yearlyHeaderCount">2 subscriptions</span>
           </div>
-          <span class="card-header-badge" style="background: var(--amber-light); color: #b45309;">Annual Subscriptions</span>
+          <span class="card-header-badge" style="background: var(--amber-light); color: #b45309;">↓ Col I–L</span>
         </div>
         <div class="items-list" id="yearlyList"></div>
         <div class="card-footer">
@@ -745,11 +748,28 @@
         </div>
       </div>
 
+      <!-- CARD 4: LOANS & CREDIT (Cols M-P) -->
+      <div class="table-card">
+        <div class="card-header-row">
+          <div class="card-title-group">
+            <div class="card-dot dot-loans"></div>
+            <h2 class="card-title">Loans & Credit</h2>
+            <span class="card-active-count" id="loansHeaderCount">Active Tracking</span>
+          </div>
+          <span class="card-header-badge" style="background: var(--purple-light); color: var(--purple-primary);">↓ Col M–P</span>
+        </div>
+        <div class="items-list" id="loansList"></div>
+        <div class="card-footer">
+          <span class="footer-label">Payoff Balance</span>
+          <span class="footer-total" id="loansFooterTotal">$512.03</span>
+        </div>
+      </div>
+
     </main>
 
     <!-- TIMELINE VIEW -->
     <main class="timeline-container" id="timelineView">
-      <h2 style="font-size: 16px; font-weight: 700; margin-bottom: 12px;">Chronological Due Date Schedule</h2>
+      <h2 style="font-size: 15px; font-weight: 700; margin-bottom: 12px;">Chronological Due Date Schedule</h2>
       <div id="timelineItemsList"></div>
     </main>
 
@@ -798,35 +818,27 @@
     }
 
     async function fetchSheetData() {
-      showToast("⏳ Syncing with Google Sheets...");
       try {
-        const res = await fetch(API_ENDPOINT);
+        const res = await fetch(`${API_ENDPOINT}?api=data`, { redirect: 'follow' });
         const json = await res.json();
         
         if (json.success && json.sheetsData && json.sheetsData['bill beta']) {
           parseRawSheetData(json.sheetsData['bill beta'].data);
           renderDashboard();
           showToast("✅ Live Google Sheets Sync Complete!");
-        } else {
-          loadFallbackData();
-          renderDashboard();
         }
       } catch(err) {
-        console.warn("Using cached data:", err);
-        loadFallbackData();
-        renderDashboard();
+        console.warn("Using offline/cached state:", err);
       }
     }
 
     function parseRawSheetData(rows) {
-      if (!rows || rows.length < 3) {
-        loadFallbackData();
-        return;
-      }
+      if (!rows || rows.length < 3) return;
 
       trackerState.debts = [];
       trackerState.bills = [];
       trackerState.yearly = [];
+      trackerState.loans = [];
 
       for (let r = 2; r < rows.length - 1; r++) {
         const row = rows[r];
@@ -835,7 +847,7 @@
         if (row[0] && String(row[0]).trim()) {
           trackerState.debts.push({
             rowIdx: r + 1,
-            colIdx: 4, // Col D (Paid)
+            colIdx: 4, // Col D
             name: String(row[0]).trim(),
             due: String(row[1]).trim(),
             amount: parseFloat(row[2]) || null,
@@ -848,7 +860,7 @@
         if (row[4] && String(row[4]).trim()) {
           trackerState.bills.push({
             rowIdx: r + 1,
-            colIdx: 8, // Col H (Paid)
+            colIdx: 8, // Col H
             name: String(row[4]).trim(),
             due: String(row[5]).trim(),
             amount: parseFloat(row[6]) || null,
@@ -861,7 +873,7 @@
         if (row[8] && String(row[8]).trim()) {
           trackerState.yearly.push({
             rowIdx: r + 1,
-            colIdx: 12, // Col L (Paid)
+            colIdx: 12, // Col L
             name: String(row[8]).trim(),
             due: String(row[9]).trim(),
             amount: parseFloat(row[10]) || null,
@@ -869,6 +881,25 @@
             section: 'yearly'
           });
         }
+
+        // Loans (Cols 12-15 / M-P)
+        if (row[12] && String(row[12]).trim()) {
+          trackerState.loans.push({
+            rowIdx: r + 1,
+            colIdx: 16, // Col P
+            name: String(row[12]).trim(),
+            due: String(row[13]).trim(),
+            amount: parseFloat(row[14]) || null,
+            paid: row[15] === true || String(row[15]).toUpperCase() === 'TRUE',
+            section: 'loans'
+          });
+        }
+      }
+
+      if (trackerState.loans.length === 0) {
+        trackerState.loans = [
+          { rowIdx: 3, colIdx: 16, name: 'Active Personal Loan', due: '9th', amount: 512.03, paid: false, section: 'loans' }
+        ];
       }
     }
 
@@ -898,12 +929,17 @@
         { rowIdx: 3, colIdx: 12, name: 'IFTTT', due: '', amount: 69.99, paid: false, section: 'yearly' },
         { rowIdx: 4, colIdx: 12, name: 'DEbt planner', due: '', amount: 24.00, paid: false, section: 'yearly' }
       ];
+
+      trackerState.loans = [
+        { rowIdx: 3, colIdx: 16, name: 'Active Personal Loan', due: '9th', amount: 512.03, paid: false, section: 'loans' }
+      ];
     }
 
     function renderDashboard() {
       renderSection('debtList', trackerState.debts);
       renderSection('billsList', trackerState.bills);
       renderSection('yearlyList', trackerState.yearly);
+      renderSection('loansList', trackerState.loans);
       renderTotals();
       renderTimeline();
     }
@@ -930,7 +966,7 @@
             <input type="checkbox" class="custom-check" ${item.paid ? 'checked' : ''} onchange="togglePaid(${item.rowIdx}, ${item.colIdx}, this.checked, '${item.section}')">
           </div>
           <div class="item-name-block">
-            <span class="item-name">${escapeHtml(item.name)}</span>
+            <span class="item-name" title="${escapeHtml(item.name)}">${escapeHtml(item.name)}</span>
           </div>
           <div>
             <span class="due-badge ${dueInfo.badgeClass}">${dueInfo.text}</span>
@@ -993,6 +1029,8 @@
       const debtSum = trackerState.debts.reduce((sum, item) => sum + (item.amount || 0), 0);
       const billsSum = trackerState.bills.reduce((sum, item) => sum + (item.amount || 0), 0);
       const yearlySum = trackerState.yearly.reduce((sum, item) => sum + (item.amount || 0), 0);
+      const loansSum = trackerState.loans.reduce((sum, item) => sum + (item.amount || 0), 0);
+      const grandTotal = debtSum + billsSum + yearlySum;
 
       document.getElementById('kpiDebtTotal').innerText = '$' + debtSum.toFixed(2);
       document.getElementById('debtFooterTotal').innerText = '$' + debtSum.toFixed(2);
@@ -1008,13 +1046,20 @@
       document.getElementById('yearlyFooterTotal').innerText = '$' + yearlySum.toFixed(2);
       document.getElementById('kpiYearlyCount').innerText = trackerState.yearly.length;
       document.getElementById('yearlyHeaderCount').innerText = `${trackerState.yearly.length} subscriptions`;
+
+      document.getElementById('kpiLoanTotal').innerText = '$' + loansSum.toFixed(2);
+      document.getElementById('loansFooterTotal').innerText = '$' + loansSum.toFixed(2);
+      document.getElementById('loansHeaderCount').innerText = `${trackerState.loans.length} active loan`;
+
+      document.getElementById('kpiGrandTotal').innerText = '$' + grandTotal.toFixed(2);
+      document.getElementById('kpiTotalCount').innerText = trackerState.debts.length + trackerState.bills.length + trackerState.yearly.length;
     }
 
     function renderTimeline() {
       const list = document.getElementById('timelineItemsList');
       list.innerHTML = '';
 
-      const all = [...trackerState.debts, ...trackerState.bills, ...trackerState.yearly];
+      const all = [...trackerState.debts, ...trackerState.bills, ...trackerState.yearly, ...trackerState.loans];
       const sorted = sortItems(all);
 
       sorted.forEach(item => {
@@ -1028,7 +1073,7 @@
           </div>
           <div class="item-name-block">
             <span class="item-name">${escapeHtml(item.name)}</span>
-            <span style="font-size: 11px; color: #94a3b8; text-transform: uppercase;">${item.section}</span>
+            <span style="font-size: 10px; color: #94a3b8; text-transform: uppercase;">${item.section}</span>
           </div>
           <div>
             <span class="due-badge ${dueInfo.badgeClass}">${dueInfo.text}</span>
@@ -1042,7 +1087,7 @@
     }
 
     async function togglePaid(rowIdx, colIdx, isChecked, section) {
-      const targetArray = trackerState[section === 'debt' ? 'debts' : section === 'bills' ? 'bills' : 'yearly'];
+      const targetArray = trackerState[section === 'debt' ? 'debts' : section === 'bills' ? 'bills' : section === 'yearly' ? 'yearly' : 'loans'];
       const item = targetArray.find(i => i.rowIdx === rowIdx && i.colIdx === colIdx);
       if (item) item.paid = isChecked;
 
@@ -1050,7 +1095,7 @@
       showToast(isChecked ? `✅ Marked ${item.name} as Paid` : `🔄 Unmarked ${item.name}`);
 
       try {
-        await fetch(`${API_ENDPOINT}?action=toggle_paid&row=${rowIdx}&col=${colIdx}&value=${isChecked}`);
+        await fetch(`${API_ENDPOINT}?action=toggle_paid&row=${rowIdx}&col=${colIdx}&value=${isChecked}`, { mode: 'no-cors' });
       } catch (err) {
         console.warn('Offline sync queued:', err);
       }
@@ -1078,13 +1123,13 @@
     }
 
     function resetCheckboxesPrompt() {
-      if (!confirm("Reset all paid checkboxes across Debt, Bills, and Yearly for the new billing cycle?")) return;
+      if (!confirm("Reset all paid checkboxes across Debt, Bills, Yearly, and Loans for the new billing cycle?")) return;
       
-      [...trackerState.debts, ...trackerState.bills, ...trackerState.yearly].forEach(item => item.paid = false);
+      [...trackerState.debts, ...trackerState.bills, ...trackerState.yearly, ...trackerState.loans].forEach(item => item.paid = false);
       renderDashboard();
       showToast("🔄 All checkboxes reset to un-paid!");
 
-      fetch(`${API_ENDPOINT}?action=reset_all_checkboxes`).catch(() => {});
+      fetch(`${API_ENDPOINT}?action=reset_all_checkboxes`, { mode: 'no-cors' }).catch(() => {});
     }
 
     function showToast(msg) {
