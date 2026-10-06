@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bill & Debt Due Date Tracker Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --surface-border: #e2e8f0;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --text-subtle: #94a3b8;
+      
+      --blue-primary: #3b82f6;
+      --blue-light: #eff6ff;
+      --blue-border: #bfdbfe;
+      
+      --green-primary: #10b981;
+      --green-light: #ecfdf5;
+      --green-border: #a7f3d0;
+      
+      --amber-primary: #f59e0b;
+      --amber-light: #fffbeb;
+      --amber-border: #fde68a;
+      
+      --purple-primary: #8b5cf6;
+      --purple-light: #f5f3ff;
+      --purple-border: #ddd6fe;
+      
+      --coral-urgent: #ef4444;
+      --coral-light: #fef2f2;
+      --coral-border: #fecaca;
+      
+      --card-radius: 18px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.05), 0 2px 4px rgba(0,0,0,0.02);
+      --shadow-lg: 0 12px 24px -4px rgba(0,0,0,0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text-main);
+      min-height: 100vh;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 1360px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* TOP HEADER */
+    .header-bar {
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--card-radius);
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .header-icon {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, #3b82f6, #6366f1);
+      color: white;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
+    }
+
+    .header-titles h1 {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: var(--text-main);
+    }
+
+    .header-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .header-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--blue-light);
+      color: var(--blue-primary);
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 12px;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 16px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.18s ease;
+    }
+
+    .btn-primary {
+      background: #2563eb;
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
+    }
+    .btn-primary:hover {
+      background: #1d4ed8;
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: var(--surface);
+      border-color: var(--surface-border);
+      color: var(--text-main);
+    }
+    .btn-secondary:hover {
+      background: #f1f5f9;
+    }
+
+    /* KPI METRICS BAR */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    .kpi-card {
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--card-radius);
+      padding: 18px 22px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .kpi-card.loan-card {
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      color: #ffffff;
+      border-color: #334155;
+    }
+
+    .kpi-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .kpi-label {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+    }
+
+    .loan-card .kpi-label {
+      color: #38bdf8;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .kpi-badge-count {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--blue-light);
+      color: var(--blue-primary);
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .kpi-value {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    .kpi-footer {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 6px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .loan-card .kpi-footer {
+      color: #94a3b8;
+    }
+
+    /* CONTROLS & FILTER BAR */
+    .controls-bar {
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--card-radius);
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 14px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .view-toggles, .sort-toggles {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #f1f5f9;
+      padding: 4px;
+      border-radius: 10px;
+    }
+
+    .toggle-btn {
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .toggle-btn.active {
+      background: var(--surface);
+      color: var(--blue-primary);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+
+    .search-input-wrap {
+      position: relative;
+      flex: 1;
+      max-width: 280px;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 8px 12px 8px 34px;
+      border: 1px solid var(--surface-border);
+      border-radius: 8px;
+      font-size: 13px;
+      outline: none;
+      background: #f8fafc;
+      transition: all 0.2s;
+    }
+
+    .search-input:focus {
+      background: #ffffff;
+      border-color: var(--blue-primary);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-subtle);
+      font-size: 14px;
+    }
+
+    /* 3 MAIN TABLES / CARDS */
+    .tables-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+      gap: 20px;
+      align-items: start;
+    }
+
+    .table-card {
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--card-radius);
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .card-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .card-title-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    .dot-debt { background: var(--blue-primary); }
+    .dot-bills { background: var(--green-primary); }
+    .dot-yearly { background: var(--amber-primary); }
+    .dot-loans { background: var(--purple-primary); }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .card-active-count {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .card-header-badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: var(--blue-light);
+      color: var(--blue-primary);
+    }
+
+    /* ITEM ROW LIST */
+    .items-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-height: 480px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .items-list::-webkit-scrollbar {
+      width: 5px;
+    }
+    .items-list::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+
+    .item-row {
+      display: grid;
+      grid-template-columns: auto 1fr auto auto;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: #f8fafc;
+      border: 1px solid transparent;
+      transition: all 0.15s ease;
+    }
+
+    .item-row:hover {
+      background: #f1f5f9;
+      border-color: #e2e8f0;
+    }
+
+    .item-row.is-paid {
+      background: #f0fdf4;
+      border-color: #bbf7d0;
+      opacity: 0.75;
+    }
+
+    .item-row.is-paid .item-name {
+      text-decoration: line-through;
+      color: #64748b;
+    }
+
+    /* CUSTOM CHECKBOX */
+    .checkbox-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .custom-check {
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border: 2px solid #94a3b8;
+      border-radius: 6px;
+      background: #ffffff;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.15s;
+    }
+
+    .custom-check:checked {
+      background: #10b981;
+      border-color: #10b981;
+    }
+
+    .custom-check:checked::after {
+      content: '✓';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .item-name-block {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .item-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .due-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      background: var(--blue-light);
+      color: var(--blue-primary);
+      white-space: nowrap;
+    }
+
+    .due-badge.urgent {
+      background: var(--coral-light);
+      color: var(--coral-urgent);
+      border: 1px solid var(--coral-border);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.02); }
+      100% { transform: scale(1); }
+    }
+
+    .due-badge.soon {
+      background: var(--amber-light);
+      color: #b45309;
+    }
+
+    .due-badge.unset {
+      background: #f1f5f9;
+      color: #94a3b8;
+    }
+
+    .item-amount {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-main);
+      text-align: right;
+      min-width: 65px;
+    }
+
+    .item-amount.unset {
+      color: var(--text-subtle);
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    /* CARD FOOTER */
+    .card-footer {
+      border-top: 1px solid var(--surface-border);
+      padding-top: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footer-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .footer-total {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    /* TIMELINE VIEW (CALENDAR STYLE) */
+    .timeline-container {
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--card-radius);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* TOAST ALERT */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #0f172a;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: var(--shadow-lg);
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.25s ease;
+      z-index: 1000;
+    }
+
+    #toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    /* RESPONSIVE */
+    html, body {
+      overflow-x: hidden;
+      width: 100%;
+    }
+
+    @media (max-width: 768px) {
+      body { padding: 10px; }
+      .app-container { width: 100%; max-width: 100%; }
+      .header-bar { padding: 14px; }
+      .header-titles h1 { font-size: 17px; }
+      .kpi-grid { grid-template-columns: 1fr; gap: 10px; }
+      .kpi-card { padding: 14px 16px; }
+      .kpi-value { font-size: 24px; }
+      .tables-container { grid-template-columns: 1fr; gap: 14px; }
+      .table-card { padding: 14px 12px; }
+      .controls-bar { flex-direction: column; align-items: stretch; padding: 12px; }
+      .view-toggles, .sort-toggles { flex-wrap: wrap; justify-content: flex-start; }
+      .toggle-btn { padding: 5px 8px; font-size: 11px; }
+      .search-input-wrap { max-width: 100%; }
+      .item-row { gap: 6px; padding: 8px 8px; font-size: 13px; }
+      .item-name { font-size: 13px; word-break: break-word; }
+      .due-badge { font-size: 10px; padding: 2px 5px; }
+      .item-amount { font-size: 13px; min-width: 50px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+
+    <!-- HEADER BAR -->
+    <header class="header-bar">
+      <div class="header-left">
+        <div class="header-icon">💎</div>
+        <div class="header-titles">
+          <h1>Bill & Debt Due Date Tracker</h1>
+          <div class="header-meta">
+            <span>Sheet: <strong>bill beta</strong></span>
+            <span>&bull;</span>
+            <span id="todayBadge" class="header-badge">📅 Loading date...</span>
+          </div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-secondary" onclick="fetchSheetData()">🔄 Refresh Data</button>
+        <button class="btn btn-primary" onclick="resetCheckboxesPrompt()">⚡ Reset All Checkboxes</button>
+      </div>
+    </header>
+
+    <!-- KPI CARDS -->
+    <section class="kpi-grid">
+      <div class="kpi-card loan-card">
+        <div class="kpi-top">
+          <span class="kpi-label">⚡ Active Loan</span>
+          <span style="font-size: 11px; background: rgba(56,189,248,0.2); color: #38bdf8; padding: 2px 8px; border-radius: 6px; font-weight: 700;">ACTIVE</span>
+        </div>
+        <div class="kpi-value" id="kpiLoanTotal">$512.03</div>
+        <div class="kpi-footer">Payoff Target: Oct 9, 2026</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-top">
+          <span class="kpi-label">Debt 6221 Total</span>
+          <span class="kpi-badge-count" id="kpiDebtCount">7</span>
+        </div>
+        <div class="kpi-value" id="kpiDebtTotal">$741.33</div>
+        <div class="kpi-footer">🟢 Sheets formula calculated</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-top">
+          <span class="kpi-label">Bills - 1539 Total</span>
+          <span class="kpi-badge-count" id="kpiBillsCount">8</span>
+        </div>
+        <div class="kpi-value" id="kpiBillsTotal">$447.98</div>
+        <div class="kpi-footer">🟢 Monthly recurring</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-top">
+          <span class="kpi-label">Yearly Bills Total</span>
+          <span class="kpi-badge-count" id="kpiYearlyCount">2</span>
+        </div>
+        <div class="kpi-value" id="kpiYearlyTotal">$93.99</div>
+        <div class="kpi-footer">Tracked separately</div>
+      </div>
+    </section>
+
+    <!-- CONTROLS & FILTER BAR -->
+    <section class="controls-bar">
+      <div class="view-toggles">
+        <button class="toggle-btn active" id="btnSideBySide" onclick="switchView('side')">📊 Side-by-Side Tables</button>
+        <button class="toggle-btn" id="btnTimeline" onclick="switchView('timeline')">⏳ Due Date Timeline</button>
+      </div>
+
+      <div class="sort-toggles">
+        <span style="font-size: 11px; font-weight: 700; color: #94a3b8; margin-right: 4px;">SORT:</span>
+        <button class="toggle-btn active" id="sort1to31" onclick="setSort('1to31')">↑ 1st → 31st</button>
+        <button class="toggle-btn" id="sortSoonest" onclick="setSort('soonest')">⏱️ Due Soonest</button>
+        <button class="toggle-btn" id="sortAmount" onclick="setSort('amount')">💲 High → Low</button>
+      </div>
+
+      <div class="search-input-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" class="search-input" placeholder="Filter bills or debts..." oninput="handleSearch(this.value)">
+      </div>
+    </section>
+
+    <!-- SIDE-BY-SIDE TABLES VIEW -->
+    <main class="tables-container" id="sideBySideView">
+      
+      <!-- CARD 1: DEBT 6221 -->
+      <div class="table-card">
+        <div class="card-header-row">
+          <div class="card-title-group">
+            <div class="card-dot dot-debt"></div>
+            <h2 class="card-title">Debt 6221</h2>
+            <span class="card-active-count" id="debtHeaderCount">7 active entries</span>
+          </div>
+          <span class="card-header-badge">↓ Due Date (1st – 31st)</span>
+        </div>
+        <div class="items-list" id="debtList"></div>
+        <div class="card-footer">
+          <span class="footer-label">Total (Sheets Formula)</span>
+          <span class="footer-total" id="debtFooterTotal">$741.33</span>
+        </div>
+      </div>
+
+      <!-- CARD 2: BILLS - 1539 -->
+      <div class="table-card">
+        <div class="card-header-row">
+          <div class="card-title-group">
+            <div class="card-dot dot-bills"></div>
+            <h2 class="card-title">Bills - 1539</h2>
+            <span class="card-active-count" id="billsHeaderCount">8 active bills</span>
+          </div>
+          <span class="card-header-badge" style="background: var(--green-light); color: var(--green-primary);">↓ Due Date (1st – 31st)</span>
+        </div>
+        <div class="items-list" id="billsList"></div>
+        <div class="card-footer">
+          <span class="footer-label">Total (Sheets Formula)</span>
+          <span class="footer-total" id="billsFooterTotal">$447.98</span>
+        </div>
+      </div>
+
+      <!-- CARD 3: YEARLY BILLS -->
+      <div class="table-card">
+        <div class="card-header-row">
+          <div class="card-title-group">
+            <div class="card-dot dot-yearly"></div>
+            <h2 class="card-title">Yearly Bills</h2>
+            <span class="card-active-count" id="yearlyHeaderCount">2 subscriptions</span>
+          </div>
+          <span class="card-header-badge" style="background: var(--amber-light); color: #b45309;">Annual Subscriptions</span>
+        </div>
+        <div class="items-list" id="yearlyList"></div>
+        <div class="card-footer">
+          <span class="footer-label">Total (Sheets Formula)</span>
+          <span class="footer-total" id="yearlyFooterTotal">$93.99</span>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- TIMELINE VIEW -->
+    <main class="timeline-container" id="timelineView">
+      <h2 style="font-size: 16px; font-weight: 700; margin-bottom: 12px;">Chronological Due Date Schedule</h2>
+      <div id="timelineItemsList"></div>
+    </main>
+
+  </div>
+
+  <div id="toast">✅ Update Saved</div>
+
+  <script>
+    const API_ENDPOINT = 'https://script.google.com/macros/s/AKfycbyLznkIyz_a3SB4L_LF4FtdEQOZBJbUHAErnY8VPTr8tFzr3rX6F7YgyzcxV95PNDfi/exec';
+
+    // State
+    let trackerState = {
+      debts: [],
+      bills: [],
+      yearly: [],
+      loans: []
+    };
+
+    let currentSort = '1to31';
+    let searchQuery = '';
+
+    // Initialize
+    window.addEventListener('DOMContentLoaded', () => {
+      updateTodayBadge();
+      loadFallbackData();
+      renderDashboard();
+      fetchSheetData();
+    });
+
+    function updateTodayBadge() {
+      const d = new Date();
+      const month = d.toLocaleString('en-US', { month: 'short' });
+      const day = d.getDate();
+      const suffix = getDaySuffix(day);
+      document.getElementById('todayBadge').innerText = `📅 Today is ${month} ${day} (${day}${suffix})`;
+    }
+
+    function getDaySuffix(d) {
+      if (d > 3 && d < 21) return 'th';
+      switch (d % 10) {
+        case 1:  return "st";
+        case 2:  return "nd";
+        case 3:  return "rd";
+        default: return "th";
+      }
+    }
+
+    async function fetchSheetData() {
+      showToast("⏳ Syncing with Google Sheets...");
+      try {
+        const res = await fetch(API_ENDPOINT);
+        const json = await res.json();
+        
+        if (json.success && json.sheetsData && json.sheetsData['bill beta']) {
+          parseRawSheetData(json.sheetsData['bill beta'].data);
+          renderDashboard();
+          showToast("✅ Live Google Sheets Sync Complete!");
+        } else {
+          loadFallbackData();
+          renderDashboard();
+        }
+      } catch(err) {
+        console.warn("Using cached data:", err);
+        loadFallbackData();
+        renderDashboard();
+      }
+    }
+
+    function parseRawSheetData(rows) {
+      if (!rows || rows.length < 3) {
+        loadFallbackData();
+        return;
+      }
+
+      trackerState.debts = [];
+      trackerState.bills = [];
+      trackerState.yearly = [];
+
+      for (let r = 2; r < rows.length - 1; r++) {
+        const row = rows[r];
+
+        // Debts (Cols 0-3 / A-D)
+        if (row[0] && String(row[0]).trim()) {
+          trackerState.debts.push({
+            rowIdx: r + 1,
+            colIdx: 4, // Col D (Paid)
+            name: String(row[0]).trim(),
+            due: String(row[1]).trim(),
+            amount: parseFloat(row[2]) || null,
+            paid: row[3] === true || String(row[3]).toUpperCase() === 'TRUE',
+            section: 'debt'
+          });
+        }
+
+        // Bills (Cols 4-7 / E-H)
+        if (row[4] && String(row[4]).trim()) {
+          trackerState.bills.push({
+            rowIdx: r + 1,
+            colIdx: 8, // Col H (Paid)
+            name: String(row[4]).trim(),
+            due: String(row[5]).trim(),
+            amount: parseFloat(row[6]) || null,
+            paid: row[7] === true || String(row[7]).toUpperCase() === 'TRUE',
+            section: 'bills'
+          });
+        }
+
+        // Yearly (Cols 8-11 / I-L)
+        if (row[8] && String(row[8]).trim()) {
+          trackerState.yearly.push({
+            rowIdx: r + 1,
+            colIdx: 12, // Col L (Paid)
+            name: String(row[8]).trim(),
+            due: String(row[9]).trim(),
+            amount: parseFloat(row[10]) || null,
+            paid: row[11] === true || String(row[11]).toUpperCase() === 'TRUE',
+            section: 'yearly'
+          });
+        }
+      }
+    }
+
+    function loadFallbackData() {
+      trackerState.debts = [
+        { rowIdx: 3, colIdx: 4, name: 'Savor', due: '4th', amount: 173.00, paid: false, section: 'debt' },
+        { rowIdx: 4, colIdx: 4, name: 'amex: 5065', due: '12th', amount: null, paid: false, section: 'debt' },
+        { rowIdx: 5, colIdx: 4, name: 'creditone: 5116', due: '22nd', amount: 8.33, paid: false, section: 'debt' },
+        { rowIdx: 6, colIdx: 4, name: 'vzw card', due: '28th', amount: 219.00, paid: false, section: 'debt' },
+        { rowIdx: 7, colIdx: 4, name: 'amex: 6696', due: '28th', amount: 146.00, paid: false, section: 'debt' },
+        { rowIdx: 8, colIdx: 4, name: 'Apple', due: '31st', amount: 195.00, paid: false, section: 'debt' },
+        { rowIdx: 9, colIdx: 4, name: 'QuickSilverOne: 4733', due: '', amount: null, paid: false, section: 'debt' }
+      ];
+
+      trackerState.bills = [
+        { rowIdx: 3, colIdx: 8, name: 'phone', due: '5th', amount: 264.00, paid: false, section: 'bills' },
+        { rowIdx: 4, colIdx: 8, name: 'Gemini AI Pro', due: '19th', amount: null, paid: false, section: 'bills' },
+        { rowIdx: 5, colIdx: 8, name: 'youtube tv', due: '20th', amount: 83.00, paid: false, section: 'bills' },
+        { rowIdx: 6, colIdx: 8, name: 'youtube tv - hd', due: '20th', amount: 10.00, paid: false, section: 'bills' },
+        { rowIdx: 7, colIdx: 8, name: 'moviepass', due: '21st', amount: 23.00, paid: false, section: 'bills' },
+        { rowIdx: 8, colIdx: 8, name: 'xbox live', due: '25th', amount: 29.99, paid: false, section: 'bills' },
+        { rowIdx: 9, colIdx: 8, name: 'GTA +', due: '25th', amount: 7.99, paid: false, section: 'bills' },
+        { rowIdx: 10, colIdx: 8, name: 'dental', due: '', amount: 30.00, paid: false, section: 'bills' }
+      ];
+
+      trackerState.yearly = [
+        { rowIdx: 3, colIdx: 12, name: 'IFTTT', due: '', amount: 69.99, paid: false, section: 'yearly' },
+        { rowIdx: 4, colIdx: 12, name: 'DEbt planner', due: '', amount: 24.00, paid: false, section: 'yearly' }
+      ];
+    }
+
+    function renderDashboard() {
+      renderSection('debtList', trackerState.debts);
+      renderSection('billsList', trackerState.bills);
+      renderSection('yearlyList', trackerState.yearly);
+      renderTotals();
+      renderTimeline();
+    }
+
+    function renderSection(containerId, items) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = '';
+
+      let filtered = items.filter(item => {
+        if (!searchQuery) return true;
+        return item.name.toLowerCase().includes(searchQuery.toLowerCase());
+      });
+
+      filtered = sortItems(filtered);
+
+      filtered.forEach(item => {
+        const row = document.createElement('div');
+        row.className = `item-row ${item.paid ? 'is-paid' : ''}`;
+
+        const dueInfo = parseDueBadge(item.due);
+
+        row.innerHTML = `
+          <div class="checkbox-wrap">
+            <input type="checkbox" class="custom-check" ${item.paid ? 'checked' : ''} onchange="togglePaid(${item.rowIdx}, ${item.colIdx}, this.checked, '${item.section}')">
+          </div>
+          <div class="item-name-block">
+            <span class="item-name">${escapeHtml(item.name)}</span>
+          </div>
+          <div>
+            <span class="due-badge ${dueInfo.badgeClass}">${dueInfo.text}</span>
+          </div>
+          <div class="item-amount ${item.amount ? '' : 'unset'}">
+            ${item.amount ? '$' + item.amount.toFixed(2) : 'Not set'}
+          </div>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    function parseDueBadge(dueStr) {
+      if (!dueStr) {
+        return { text: 'Set Due Day', badgeClass: 'unset' };
+      }
+
+      const match = dueStr.match(/\d+/);
+      if (!match) return { text: dueStr, badgeClass: 'unset' };
+
+      const dueDay = parseInt(match[0], 10);
+      const today = new Date().getDate();
+
+      if (dueDay === today) {
+        return { text: `📅 ${dueDay}${getDaySuffix(dueDay)} (Due today!)`, badgeClass: 'urgent' };
+      } else if (dueDay > today && dueDay - today <= 7) {
+        return { text: `⏱️ ${dueDay}${getDaySuffix(dueDay)} (in ${dueDay - today} days)`, badgeClass: 'soon' };
+      } else if (dueDay > today) {
+        return { text: `📅 ${dueDay}${getDaySuffix(dueDay)} (in ${dueDay - today} days)`, badgeClass: '' };
+      } else {
+        const daysAway = (30 - today) + dueDay;
+        return { text: `📅 ${dueDay}${getDaySuffix(dueDay)} (in ${daysAway} days)`, badgeClass: '' };
+      }
+    }
+
+    function sortItems(items) {
+      const copy = [...items];
+      if (currentSort === '1to31') {
+        copy.sort((a, b) => {
+          const dayA = parseInt((a.due || '').match(/\d+/) || 99, 10);
+          const dayB = parseInt((b.due || '').match(/\d+/) || 99, 10);
+          return dayA - dayB;
+        });
+      } else if (currentSort === 'soonest') {
+        const today = new Date().getDate();
+        copy.sort((a, b) => {
+          const dayA = parseInt((a.due || '').match(/\d+/) || 99, 10);
+          const dayB = parseInt((b.due || '').match(/\d+/) || 99, 10);
+          const diffA = dayA >= today ? dayA - today : dayA + 30 - today;
+          const diffB = dayB >= today ? dayB - today : dayB + 30 - today;
+          return diffA - diffB;
+        });
+      } else if (currentSort === 'amount') {
+        copy.sort((a, b) => (b.amount || 0) - (a.amount || 0));
+      }
+      return copy;
+    }
+
+    function renderTotals() {
+      const debtSum = trackerState.debts.reduce((sum, item) => sum + (item.amount || 0), 0);
+      const billsSum = trackerState.bills.reduce((sum, item) => sum + (item.amount || 0), 0);
+      const yearlySum = trackerState.yearly.reduce((sum, item) => sum + (item.amount || 0), 0);
+
+      document.getElementById('kpiDebtTotal').innerText = '$' + debtSum.toFixed(2);
+      document.getElementById('debtFooterTotal').innerText = '$' + debtSum.toFixed(2);
+      document.getElementById('kpiDebtCount').innerText = trackerState.debts.length;
+      document.getElementById('debtHeaderCount').innerText = `${trackerState.debts.length} active entries`;
+
+      document.getElementById('kpiBillsTotal').innerText = '$' + billsSum.toFixed(2);
+      document.getElementById('billsFooterTotal').innerText = '$' + billsSum.toFixed(2);
+      document.getElementById('kpiBillsCount').innerText = trackerState.bills.length;
+      document.getElementById('billsHeaderCount').innerText = `${trackerState.bills.length} active bills`;
+
+      document.getElementById('kpiYearlyTotal').innerText = '$' + yearlySum.toFixed(2);
+      document.getElementById('yearlyFooterTotal').innerText = '$' + yearlySum.toFixed(2);
+      document.getElementById('kpiYearlyCount').innerText = trackerState.yearly.length;
+      document.getElementById('yearlyHeaderCount').innerText = `${trackerState.yearly.length} subscriptions`;
+    }
+
+    function renderTimeline() {
+      const list = document.getElementById('timelineItemsList');
+      list.innerHTML = '';
+
+      const all = [...trackerState.debts, ...trackerState.bills, ...trackerState.yearly];
+      const sorted = sortItems(all);
+
+      sorted.forEach(item => {
+        const row = document.createElement('div');
+        row.className = `item-row ${item.paid ? 'is-paid' : ''}`;
+        const dueInfo = parseDueBadge(item.due);
+
+        row.innerHTML = `
+          <div class="checkbox-wrap">
+            <input type="checkbox" class="custom-check" ${item.paid ? 'checked' : ''} onchange="togglePaid(${item.rowIdx}, ${item.colIdx}, this.checked, '${item.section}')">
+          </div>
+          <div class="item-name-block">
+            <span class="item-name">${escapeHtml(item.name)}</span>
+            <span style="font-size: 11px; color: #94a3b8; text-transform: uppercase;">${item.section}</span>
+          </div>
+          <div>
+            <span class="due-badge ${dueInfo.badgeClass}">${dueInfo.text}</span>
+          </div>
+          <div class="item-amount ${item.amount ? '' : 'unset'}">
+            ${item.amount ? '$' + item.amount.toFixed(2) : 'Not set'}
+          </div>
+        `;
+        list.appendChild(row);
+      });
+    }
+
+    async function togglePaid(rowIdx, colIdx, isChecked, section) {
+      const targetArray = trackerState[section === 'debt' ? 'debts' : section === 'bills' ? 'bills' : 'yearly'];
+      const item = targetArray.find(i => i.rowIdx === rowIdx && i.colIdx === colIdx);
+      if (item) item.paid = isChecked;
+
+      renderDashboard();
+      showToast(isChecked ? `✅ Marked ${item.name} as Paid` : `🔄 Unmarked ${item.name}`);
+
+      try {
+        await fetch(`${API_ENDPOINT}?action=toggle_paid&row=${rowIdx}&col=${colIdx}&value=${isChecked}`);
+      } catch (err) {
+        console.warn('Offline sync queued:', err);
+      }
+    }
+
+    function switchView(view) {
+      document.getElementById('btnSideBySide').classList.toggle('active', view === 'side');
+      document.getElementById('btnTimeline').classList.toggle('active', view === 'timeline');
+
+      document.getElementById('sideBySideView').style.display = view === 'side' ? 'grid' : 'none';
+      document.getElementById('timelineView').style.display = view === 'timeline' ? 'flex' : 'none';
+    }
+
+    function setSort(sortType) {
+      currentSort = sortType;
+      document.getElementById('sort1to31').classList.toggle('active', sortType === '1to31');
+      document.getElementById('sortSoonest').classList.toggle('active', sortType === 'soonest');
+      document.getElementById('sortAmount').classList.toggle('active', sortType === 'amount');
+      renderDashboard();
+    }
+
+    function handleSearch(val) {
+      searchQuery = val.trim();
+      renderDashboard();
+    }
+
+    function resetCheckboxesPrompt() {
+      if (!confirm("Reset all paid checkboxes across Debt, Bills, and Yearly for the new billing cycle?")) return;
+      
+      [...trackerState.debts, ...trackerState.bills, ...trackerState.yearly].forEach(item => item.paid = false);
+      renderDashboard();
+      showToast("🔄 All checkboxes reset to un-paid!");
+
+      fetch(`${API_ENDPOINT}?action=reset_all_checkboxes`).catch(() => {});
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.innerText = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    function escapeHtml(str) {
+      return String(str).replace(/[&<>'"]/g, tag => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        "'": '&#39;',
+        '"': '&quot;'
+      }[tag] || tag));
+    }
+  </script>
+</body>
+</html>

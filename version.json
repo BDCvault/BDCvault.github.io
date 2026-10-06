@@ -1,9 +1,9 @@
 {
-  "version": "4.9.3",
-  "releaseDate": "September 12, 2026",
+  "version": "4.9.4",
+  "releaseDate": "October 5, 2026",
   "notes": [
-    "Removed loan phrasing from monthly statement email notifications.",
-    "Updated account activation emails with clean statement copy.",
-    "Refreshed monthly statement email previews in Executive Center."
+    "Added interactive Bill and Debt Due Date Tracker Dashboard.",
+    "Integrated interactive paid checkboxes with monthly auto-reset engine.",
+    "Deployed live side-by-side tables, timeline views, and calculations."
   ]
 }
