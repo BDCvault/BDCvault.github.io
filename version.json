@@ -1,10 +1,11 @@
 {
-  "version": "4.9.5",
+  "version": "4.10.0",
   "releaseDate": "October 6, 2026",
   "notes": [
-    "Added 4-category Bill & Debt Due Date Tracker Dashboard.",
-    "Integrated interactive paid checkboxes with monthly auto-reset engine.",
-    "Added live due-date countdown badges and timeline schedule view.",
-    "Deployed live Google Apps Script Web App version 11."
+    "Added Loans I Owe payables tracker to Executive Center.",
+    "Integrated creditor cards with visual debt payoff progress meters.",
+    "Added interactive payment logger with automatic balance recalculation.",
+    "Built detailed chronological payment history ledger for each creditor.",
+    "Deployed Google Apps Script v70 with full payables API."
   ]
 }

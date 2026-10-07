@@ -30,6 +30,7 @@
 
 | Version | Release Date | Summary of Features & Fixes |
 | :--- | :--- | :--- |
+| **`v4.10.0`** | Oct 6, 2026 | Added Loans I Owe personal debt tracker & payoff progress engine to Executive Center. |
 | **`v4.9.5`** | Oct 6, 2026 | Updated Bills & Debt Tracker with 4-category layout. |
 | **`v4.9.4`** | Oct 5, 2026 | Added interactive Bill & Debt Due Date Tracker Dashboard with auto-reset checkboxes. |
 | **`v4.9.3`** | Sep 12, 2026 | Removed loan phrasing from monthly statement email templates and previews. |

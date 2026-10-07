@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v4.10.0] - 2026-10-06
+### Added
+- Added Loans I Owe payables tracker to Executive Center.
+- Integrated creditor cards with visual debt payoff progress meters.
+- Added interactive payment logger with automatic balance recalculation.
+- Built detailed chronological payment history ledger for each creditor.
+- Deployed Google Apps Script v70 with full payables API.
+
 ## [v4.9.5] - 2026-10-06
 ### Added
 - Added 4-category Bill & Debt Due Date Tracker Dashboard.
