@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>BDC Vault | Account Application</title>
+  <title>BDC Vault | Account Application & Underwriting</title>
   
   <!-- PWA & Mobile Web App Meta -->
   <link rel="manifest" href="manifest.json">
@@ -19,45 +19,131 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+  <style>
+    .receipt-box {
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(168, 85, 247, 0.4);
+      border-radius: 18px;
+      padding: 24px 20px;
+      margin-top: 10px;
+      text-align: left;
+    }
+    .receipt-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+      font-size: 0.9rem;
+    }
+    .receipt-row:last-child {
+      border-bottom: none;
+    }
+    .receipt-label {
+      color: var(--text-muted);
+    }
+    .receipt-val {
+      color: white;
+      font-weight: 700;
+    }
+  </style>
 </head>
 <body>
 
-  <div class="container" style="max-width:480px; padding-top:40px;">
+  <div class="container" style="max-width:500px; padding-top:40px;">
     
     <div style="text-align:center; margin-bottom:24px;">
       <div style="display:inline-block; background:linear-gradient(135deg, #a855f7, #6366f1); color:white; width:48px; height:48px; line-height:48px; border-radius:14px; font-size:24px; box-shadow:0 0 15px rgba(168,85,247,0.4);">💎</div>
-      <h2 style="font-family:var(--font-heading); font-size:1.6rem; color:white; margin-top:8px;">BDC Vault <span class="bdc-version-tag" style="font-size:0.75rem; background:rgba(168,85,247,0.2); color:#d8b4fe; border:1px solid rgba(168,85,247,0.4); padding:1px 6px; border-radius:6px; font-weight:700; margin-left:4px;">v4.7.0</span></h2>
-      <p style="color:var(--text-muted); font-size:0.88rem;">Private Account & Loan Application</p>
+      <h2 style="font-family:var(--font-heading); font-size:1.6rem; color:white; margin-top:8px;">BDC Vault <span class="bdc-version-tag" style="font-size:0.75rem; background:rgba(168,85,247,0.2); color:#d8b4fe; border:1px solid rgba(168,85,247,0.4); padding:1px 6px; border-radius:6px; font-weight:700; margin-left:4px;">v4.11.0</span></h2>
+      <p style="color:var(--text-muted); font-size:0.88rem;">Private Capital Account & Loan Application</p>
     </div>
 
-    <div class="card">
-      <form onsubmit="handleApply(event)">
-        <div class="form-group">
-          <label>Full Legal Name</label>
-          <input type="text" id="applyName" placeholder="e.g. Jane Doe" required>
+    <!-- APPLICATION FORM CARD -->
+    <div class="card" id="applyCard">
+      <div id="applyFormContainer">
+        <h3 style="font-family:var(--font-heading); font-size:1.3rem; margin-bottom:6px; color:white; text-align:center;">Request Credit Line</h3>
+        <p style="color:var(--text-muted); font-size:0.85rem; text-align:center; margin-bottom:20px;">
+          Submit your information to apply for a private capital tracking account.
+        </p>
+
+        <form onsubmit="handleApply(event)" id="applicationForm">
+          <div class="form-group">
+            <label>Full Legal Name</label>
+            <input type="text" id="applyName" placeholder="e.g. Jane Doe" required autocomplete="name">
+          </div>
+
+          <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" id="applyEmail" placeholder="e.g. jane@example.com" required autocomplete="email">
+          </div>
+
+          <div class="form-group">
+            <label>Requested Starting Principal ($)</label>
+            <input type="number" id="applyPrincipal" placeholder="e.g. 5000" min="0" step="100" required>
+          </div>
+
+          <div class="form-group">
+            <label>Notes / Purpose (Optional)</label>
+            <input type="text" id="applyNotes" placeholder="e.g. Personal loan, emergency expenses, etc.">
+          </div>
+
+          <button type="submit" id="applyBtn" class="btn-primary" style="width:100%; margin-top:10px; padding:14px; font-size:1rem;">
+            🚀 Submit Application
+          </button>
+          <div id="applyStatus" style="text-align:center; margin-top:14px; font-weight:600; display:none; padding:12px; border-radius:10px;"></div>
+        </form>
+      </div>
+
+      <!-- SUCCESS CONFIRMATION RECEIPT (Rendered on submission) -->
+      <div id="applyReceiptContainer" style="display:none; text-align:center;">
+        <div style="font-size:44px; margin-bottom:12px;">✅</div>
+        <h3 style="font-family:var(--font-heading); font-size:1.4rem; color:white; margin-bottom:6px;">Application Submitted!</h3>
+        <p style="color:#34d399; font-size:0.9rem; margin-bottom:20px; font-weight:600;">
+          Your application has been received and queued for Underwriting Review.
+        </p>
+
+        <div class="receipt-box">
+          <div class="receipt-row">
+            <span class="receipt-label">Application ID:</span>
+            <span class="receipt-val" id="receiptAppId" style="color:#c084fc; font-family:monospace; font-size:1rem;">APP-000000</span>
+          </div>
+          <div class="receipt-row">
+            <span class="receipt-label">Applicant:</span>
+            <span class="receipt-val" id="receiptName">-</span>
+          </div>
+          <div class="receipt-row">
+            <span class="receipt-label">Email:</span>
+            <span class="receipt-val" id="receiptEmail" style="color:#38bdf8;">-</span>
+          </div>
+          <div class="receipt-row">
+            <span class="receipt-label">Requested Principal:</span>
+            <span class="receipt-val" id="receiptPrincipal" style="color:#34d399;">$0.00</span>
+          </div>
+          <div class="receipt-row">
+            <span class="receipt-label">Status:</span>
+            <span class="receipt-val" style="color:#fbbf24; background:rgba(251,191,36,0.15); padding:3px 8px; border-radius:6px; font-size:0.8rem;">⏳ UNDERWRITING REVIEW</span>
+          </div>
         </div>
 
-        <div class="form-group">
-          <label>Email Address</label>
-          <input type="email" id="applyEmail" placeholder="jane@example.com" required>
+        <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:16px; margin:20px 0; text-align:left; font-size:0.85rem; color:#94a3b8; line-height:1.5;">
+          <strong style="color:white; display:block; margin-bottom:4px;">What happens next?</strong>
+          1. Brian will review your application in the Executive Underwriting Inbox.<br>
+          2. Once approved, you will receive an encrypted email with your 48-hour password activation link.<br>
+          3. You can then log into your private 24/7 statement portal.
         </div>
 
-        <div class="form-group">
-          <label>Requested Starting Principal ($)</label>
-          <input type="number" id="applyPrincipal" placeholder="e.g. 5000">
-        </div>
-
-        <button type="submit" id="applyBtn" class="btn-primary" style="width:100%; margin-top:10px;">Submit Application</button>
-        <div id="applyStatus" style="text-align:center; margin-top:14px; font-weight:600; display:none;"></div>
-      </form>
+        <button onclick="resetApplyForm()" class="btn-primary" style="width:100%; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:white;">
+          Submit Another Application
+        </button>
+      </div>
     </div>
 
     <div style="text-align:center; margin-top:20px;">
-      <a href="index.html" class="nav-link">← Return to BDC Vault Portal</a>
+      <a href="index.html" class="nav-link" style="color:var(--text-muted); font-size:0.88rem; text-decoration:none;">← Return to BDC Vault Portal</a>
     </div>
 
     <footer>
-      &copy; 2026 BDC Vault <span class="bdc-version-tag" style="color:#c084fc; font-weight:700; cursor:pointer;">v4.7.0</span> &bull; Private Account Application
+      &copy; 2026 BDC Vault <span class="bdc-version-tag" style="color:#c084fc; font-weight:700; cursor:pointer;">v4.11.0</span> &bull; Private Account Application
     </footer>
 
   </div>
@@ -65,20 +151,73 @@
   <script src="app.js"></script>
   <script src="pwa.js"></script>
   <script>
-    function handleApply(e) {
+    async function handleApply(e) {
       e.preventDefault();
       const btn = document.getElementById('applyBtn');
       const status = document.getElementById('applyStatus');
-      btn.disabled = true;
-      btn.innerText = "Submitting to Underwriting...";
+      
+      const name = document.getElementById('applyName').value.trim();
+      const email = document.getElementById('applyEmail').value.trim();
+      const principal = document.getElementById('applyPrincipal').value.trim();
+      const notes = document.getElementById('applyNotes').value.trim();
 
-      setTimeout(() => {
-        btn.disabled = false;
-        btn.innerText = "Submit Application";
+      if (!name || !email) {
         status.style.display = 'block';
-        status.style.color = '#34d399';
-        status.innerText = "✅ Application submitted! We will activate your account shortly.";
-      }, 1000);
+        status.style.background = 'rgba(239, 68, 68, 0.15)';
+        status.style.color = '#f87171';
+        status.innerText = '❌ Please provide both your full name and email address.';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = '⏳ Submitting to Underwriting...';
+      status.style.display = 'none';
+
+      try {
+        const res = await fetchBankApi('apply', {
+          name: name,
+          email: email,
+          principal: principal,
+          notes: notes
+        });
+
+        if (res && res.success) {
+          // Render receipt
+          document.getElementById('applyFormContainer').style.display = 'none';
+          document.getElementById('applyReceiptContainer').style.display = 'block';
+          
+          document.getElementById('receiptAppId').innerText = res.applicationId || 'APP-' + Math.floor(100000 + Math.random() * 900000);
+          document.getElementById('receiptName').innerText = name;
+          document.getElementById('receiptEmail').innerText = email;
+          document.getElementById('receiptPrincipal').innerText = formatMoney(principal);
+          document.getElementById('applicationForm').reset();
+        } else {
+          btn.disabled = false;
+          btn.innerHTML = '🚀 Submit Application';
+          status.style.display = 'block';
+          status.style.background = 'rgba(239, 68, 68, 0.15)';
+          status.style.color = '#f87171';
+          status.innerText = res && res.message ? `❌ ${res.message}` : '❌ Application submission failed. Please check your connection and try again.';
+        }
+      } catch (err) {
+        console.error("Application error:", err);
+        btn.disabled = false;
+        btn.innerHTML = '🚀 Submit Application';
+        status.style.display = 'block';
+        status.style.background = 'rgba(239, 68, 68, 0.15)';
+        status.style.color = '#f87171';
+        status.innerText = '❌ Network connection error. Please try again.';
+      }
+    }
+
+    function resetApplyForm() {
+      document.getElementById('applyReceiptContainer').style.display = 'none';
+      document.getElementById('applyFormContainer').style.display = 'block';
+      const btn = document.getElementById('applyBtn');
+      btn.disabled = false;
+      btn.innerHTML = '🚀 Submit Application';
+      const status = document.getElementById('applyStatus');
+      status.style.display = 'none';
     }
   </script>
 </body>

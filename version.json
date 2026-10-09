@@ -1,11 +1,11 @@
 {
-  "version": "4.10.0",
-  "releaseDate": "October 6, 2026",
+  "version": "4.11.0",
+  "releaseDate": "October 8, 2026",
   "notes": [
-    "Added Loans I Owe payables tracker to Executive Center.",
-    "Integrated creditor cards with visual debt payoff progress meters.",
-    "Added interactive payment logger with automatic balance recalculation.",
-    "Built detailed chronological payment history ledger for each creditor.",
-    "Deployed Google Apps Script v70 with full payables API."
+    "Connected public apply form to live Google Sheets backend.",
+    "Added Underwriting Inbox in Executive Center with 1-click approvals.",
+    "Integrated instant email alerts to executive for new applications.",
+    "Built automatic ledger tab provisioning and password setup emails.",
+    "Added live application status badges and KPI metric cards."
   ]
 }

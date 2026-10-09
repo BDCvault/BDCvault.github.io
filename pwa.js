@@ -1,6 +1,6 @@
 // BDC Vault PWA & wosBDC Style Live App Update Alert Engine
 (function() {
-  const CURRENT_BUILD_VERSION = "4.10.0";
+  const CURRENT_BUILD_VERSION = "4.11.0";
   let deferredPrompt = null;
 
   // 1. Version Comparison Logic (from wosBDC)

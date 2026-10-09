@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v4.11.0] - 2026-10-08
+### Added
+- Connected public apply form to live Google Sheets backend.
+- Added Underwriting Inbox in Executive Center with 1-click approvals.
+- Integrated instant email alerts to executive for new applications.
+- Built automatic ledger tab provisioning and password setup emails.
+- Added live application status badges and KPI metric cards.
+
 ## [v4.10.0] - 2026-10-06
 ### Added
 - Added Loans I Owe payables tracker to Executive Center.

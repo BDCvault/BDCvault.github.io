@@ -9,6 +9,7 @@
 
 * **Live Web App**: [https://bdcvault.github.io/](https://bdcvault.github.io/)
 * **Borrower Sign In**: [https://bdcvault.github.io/login.html](https://bdcvault.github.io/login.html)
+* **Borrower Application**: [https://bdcvault.github.io/apply.html](https://bdcvault.github.io/apply.html)
 * **Executive Command Center**: [https://bdcvault.github.io/admin.html](https://bdcvault.github.io/admin.html)
 
 ---
@@ -30,6 +31,7 @@
 
 | Version | Release Date | Summary of Features & Fixes |
 | :--- | :--- | :--- |
+| **`v4.11.0`** | Oct 8, 2026 | Added live account application pipeline and Underwriting Inbox to Executive Center. |
 | **`v4.10.0`** | Oct 6, 2026 | Added Loans I Owe personal debt tracker & payoff progress engine to Executive Center. |
 | **`v4.9.5`** | Oct 6, 2026 | Updated Bills & Debt Tracker with 4-category layout. |
 | **`v4.9.4`** | Oct 5, 2026 | Added interactive Bill & Debt Due Date Tracker Dashboard with auto-reset checkboxes. |

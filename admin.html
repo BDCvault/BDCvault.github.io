@@ -349,6 +349,7 @@
       justify-content: center;
       z-index: 1000;
       padding: 20px;
+    }
     .modal-box {
       background: #0f172a;
       border: 1px solid var(--border-color);
@@ -406,14 +407,60 @@
       align-items: center;
       gap: 4px;
     }
+    /* Applications & Underwriting Inbox Styles */
+    .app-card {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(168, 85, 247, 0.3);
+      border-radius: 18px;
+      padding: 20px;
+      margin-bottom: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      transition: all 0.2s ease;
+      position: relative;
+      box-sizing: border-box;
+      max-width: 100%;
+      overflow-x: hidden;
+    }
+    .app-card:hover {
+      border-color: rgba(168, 85, 247, 0.6);
+      box-shadow: 0 10px 30px -5px rgba(168, 85, 247, 0.2);
+    }
+    .app-avatar {
+      width: 44px;
+      height: 44px;
+      min-width: 44px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #a855f7, #6366f1);
+      color: white;
+      font-weight: 800;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 15px rgba(168, 85, 247, 0.3);
+    }
+    .app-status-badge {
+      font-size: 0.75rem;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
     html, body {
       overflow-x: hidden;
       max-width: 100vw;
+      width: 100%;
     }
     .container {
       width: 100%;
       max-width: 100%;
       box-sizing: border-box;
+      overflow-x: hidden;
     }
     .admin-nav-tabs {
       max-width: 100%;
@@ -429,10 +476,14 @@
     }
     @media (max-width: 768px) {
       .container { padding: 0 12px; }
+      .card { padding: 20px 14px; border-radius: 18px; }
       .myloans-grid {
         grid-template-columns: 1fr;
       }
       .myloan-card {
+        padding: 16px 14px;
+      }
+      .app-card {
         padding: 16px 14px;
       }
     }
@@ -508,6 +559,9 @@
         <button class="admin-tab-btn active" onclick="switchAdminSection('overview', this)">
           📊 Overview
         </button>
+        <button class="admin-tab-btn" id="tabBtnApplications" onclick="switchAdminSection('applications', this)">
+          📥 Applications <span id="pendingAppsTabBadge" style="display:none; background:#ef4444; color:white; font-size:0.7rem; font-weight:800; padding:2px 6px; border-radius:10px; margin-left:4px;">0</span>
+        </button>
         <button class="admin-tab-btn" onclick="switchAdminSection('borrowers', this)">
           👥 Borrowers List
         </button>
@@ -527,6 +581,18 @@
 
       <!-- SECTION 1: OVERVIEW -->
       <div id="sectionOverview">
+        <!-- OVERVIEW UNDERWRITING ALERT BANNER -->
+        <div id="overviewUnderwritingAlert" style="display:none; background:linear-gradient(135deg, rgba(168,85,247,0.2), rgba(99,102,241,0.2)); border:1px solid rgba(168,85,247,0.4); border-radius:16px; padding:16px 20px; margin-bottom:20px; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div style="font-size:26px;">📥</div>
+            <div>
+              <div style="color:white; font-weight:700; font-size:1rem;">New Loan Applications Awaiting Review</div>
+              <div style="color:var(--text-muted); font-size:0.85rem;" id="overviewUnderwritingAlertText">You have pending borrower applications in the Underwriting Inbox.</div>
+            </div>
+          </div>
+          <button class="btn-primary" onclick="switchToApplicationsTab()" style="padding:8px 16px; font-size:0.85rem; background:linear-gradient(135deg, #a855f7, #6366f1);">Review Inbox ➔</button>
+        </div>
+
         <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:16px; margin-bottom:24px;">
           <div class="card" style="padding:20px; margin:0;">
             <div style="font-size:0.75rem; text-transform:uppercase; color:var(--text-muted); font-weight:600;">Total Loan Volume</div>
@@ -570,7 +636,100 @@
         </div>
       </div>
 
-      <!-- SECTION 2: BORROWERS DIRECTORY (LIST OF USERS) -->
+      <!-- SECTION 2: APPLICATIONS & UNDERWRITING INBOX -->
+      <div id="sectionApplications" style="display:none;">
+        
+        <!-- HEADER & ACTIONS -->
+        <div class="card" style="margin-bottom:20px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+            <div>
+              <h3 style="font-family:var(--font-heading); font-size:1.35rem; color:white; margin-bottom:4px; display:flex; align-items:center; gap:8px;">
+                📥 Underwriting & Applications Inbox <span id="kpiPendingHeaderBadge" style="font-size:0.75rem; background:rgba(239,68,68,0.2); color:#fca5a5; border:1px solid rgba(239,68,68,0.4); padding:3px 8px; border-radius:6px;">0 Pending</span>
+              </h3>
+              <p style="color:var(--text-muted); font-size:0.85rem; margin:0;">
+                Review incoming credit line requests from apply.html. 1-click approve to initialize ledger accounts and dispatch welcome emails.
+              </p>
+            </div>
+            <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+              <button class="action-btn-sm btn-edit" onclick="loadApplicationsList(true)" style="padding:10px 16px; font-size:0.85rem;">
+                🔄 Refresh Applications
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- KPI SUMMARY GRID -->
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:12px; margin-bottom:20px;">
+          <div class="card" style="padding:16px; margin:0; border-color:rgba(239,68,68,0.3); background:rgba(239,68,68,0.04);">
+            <div style="font-size:0.7rem; text-transform:uppercase; color:#fca5a5; font-weight:700; letter-spacing:0.5px;">Pending Underwriting</div>
+            <div style="font-family:var(--font-heading); font-size:1.6rem; font-weight:800; color:#ef4444; margin:4px 0;" id="kpiPendingAppsCount">0</div>
+            <div style="font-size:0.7rem; color:var(--text-muted);">Awaiting decision</div>
+          </div>
+
+          <div class="card" style="padding:16px; margin:0; border-color:rgba(168,85,247,0.3); background:rgba(168,85,247,0.04);">
+            <div style="font-size:0.7rem; text-transform:uppercase; color:#d8b4fe; font-weight:700; letter-spacing:0.5px;">Requested Capital</div>
+            <div style="font-family:var(--font-heading); font-size:1.6rem; font-weight:800; color:#c084fc; margin:4px 0;" id="kpiPendingAppsVolume">$0.00</div>
+            <div style="font-size:0.7rem; color:var(--text-muted);">Total requested</div>
+          </div>
+
+          <div class="card" style="padding:16px; margin:0; border-color:rgba(16,185,129,0.3); background:rgba(16,185,129,0.04);">
+            <div style="font-size:0.7rem; text-transform:uppercase; color:#6ee7b7; font-weight:700; letter-spacing:0.5px;">Approved Accounts</div>
+            <div style="font-family:var(--font-heading); font-size:1.6rem; font-weight:800; color:#10b981; margin:4px 0;" id="kpiApprovedAppsCount">0</div>
+            <div style="font-size:0.7rem; color:var(--text-muted);">Activated accounts</div>
+          </div>
+
+          <div class="card" style="padding:16px; margin:0; border-color:rgba(59,130,246,0.3); background:rgba(59,130,246,0.04);">
+            <div style="font-size:0.7rem; text-transform:uppercase; color:#93c5fd; font-weight:700; letter-spacing:0.5px;">Approval Rate</div>
+            <div style="font-family:var(--font-heading); font-size:1.6rem; font-weight:800; color:#3b82f6; margin:4px 0;" id="kpiAppApprovalRate">100%</div>
+            <div style="font-size:0.7rem; color:var(--text-muted);">Conversion</div>
+          </div>
+        </div>
+
+        <!-- PENDING APPLICATIONS CARDS -->
+        <div class="card" style="margin-bottom:24px;">
+          <h4 style="font-family:var(--font-heading); font-size:1.15rem; color:white; margin-bottom:14px; display:flex; align-items:center; gap:8px;">
+            ⚡ Pending Action Required <span id="pendingActionCountBadge" style="font-size:0.75rem; background:#ef4444; color:white; padding:2px 6px; border-radius:10px;">0</span>
+          </h4>
+          
+          <div id="pendingApplicationsContainer">
+            <div style="text-align:center; padding:24px; color:var(--text-muted);">Loading pending applications...</div>
+          </div>
+        </div>
+
+        <!-- ALL APPLICATIONS HISTORY TABLE -->
+        <div class="card">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px;">
+            <div>
+              <h4 style="font-family:var(--font-heading); font-size:1.15rem; color:white; margin:0;">📑 All Applications & Audit Trail</h4>
+              <p style="color:var(--text-muted); font-size:0.8rem; margin:2px 0 0 0;">Comprehensive history of approved, pending, and declined requests.</p>
+            </div>
+          </div>
+          
+          <div style="overflow-x:auto;">
+            <table class="data-table" id="allApplicationsTable">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>ID</th>
+                  <th>Applicant</th>
+                  <th>Email</th>
+                  <th>Requested</th>
+                  <th>Approved Limit</th>
+                  <th>Status</th>
+                  <th>Notes</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="allApplicationsTableBody">
+                <tr><td colspan="9" style="text-align:center; padding:20px; color:var(--text-muted);">Loading historical records...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- SECTION 3: BORROWERS DIRECTORY (LIST OF USERS) -->
       <div id="sectionBorrowers" style="display:none;">
         <div class="card">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
@@ -1130,22 +1289,354 @@
   <script src="pwa.js"></script>
   <script>
     let cachedBorrowers = [];
+    let cachedApplications = [];
 
     function switchAdminSection(section, btn) {
       document.querySelectorAll('.admin-tab-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
+      if (btn) btn.classList.add('active');
 
       document.getElementById('sectionOverview').style.display = (section === 'overview') ? 'block' : 'none';
+      document.getElementById('sectionApplications').style.display = (section === 'applications') ? 'block' : 'none';
       document.getElementById('sectionBorrowers').style.display = (section === 'borrowers') ? 'block' : 'none';
       document.getElementById('sectionLedger').style.display = (section === 'ledger') ? 'block' : 'none';
       document.getElementById('sectionAccounts').style.display = (section === 'accounts') ? 'block' : 'none';
       document.getElementById('sectionEmails').style.display = (section === 'emails') ? 'block' : 'none';
       document.getElementById('sectionMyLoans').style.display = (section === 'myloans') ? 'block' : 'none';
 
+      if (section === 'applications') loadApplicationsList();
       if (section === 'borrowers') loadBorrowersDirectory();
       if (section === 'ledger') loadDetailedLedger();
       if (section === 'accounts') loadBorrowerAccountsList();
       if (section === 'myloans') loadMyLoansSection();
+    }
+
+    function switchToApplicationsTab() {
+      const tabBtn = document.getElementById('tabBtnApplications') || document.querySelectorAll('.admin-tab-btn')[1];
+      switchAdminSection('applications', tabBtn);
+    }
+
+    // ==========================================
+    // 📥 UNDERWRITING & APPLICATIONS INBOX ENGINE
+    // ==========================================
+    async function loadApplicationsList(forceRefresh = false) {
+      // 1. Initial local load
+      try {
+        const local = localStorage.getItem('bdc_admin_applications');
+        if (local) {
+          cachedApplications = JSON.parse(local) || [];
+          renderApplicationsUI();
+        }
+      } catch(e) {}
+
+      // 2. Fetch from backend API
+      try {
+        const apps = await fetchBankApi('applications');
+        if (Array.isArray(apps)) {
+          cachedApplications = apps;
+          try {
+            localStorage.setItem('bdc_admin_applications', JSON.stringify(apps));
+          } catch(e) {}
+          renderApplicationsUI();
+        }
+      } catch(err) {
+        console.warn('Failed to fetch applications from API:', err);
+      }
+    }
+
+    function renderApplicationsUI() {
+      const container = document.getElementById('pendingApplicationsContainer');
+      const tbody = document.getElementById('allApplicationsTableBody');
+      const tabBadge = document.getElementById('pendingAppsTabBadge');
+      const overviewAlert = document.getElementById('overviewUnderwritingAlert');
+      const overviewAlertText = document.getElementById('overviewUnderwritingAlertText');
+      const headerBadge = document.getElementById('kpiPendingHeaderBadge');
+      const countBadge = document.getElementById('pendingActionCountBadge');
+
+      if (!container || !tbody) return;
+
+      const apps = cachedApplications || [];
+      const pendingApps = apps.filter(a => String(a.status || '').toUpperCase() === 'PENDING');
+      const approvedApps = apps.filter(a => String(a.status || '').toUpperCase() === 'APPROVED');
+      const declinedApps = apps.filter(a => String(a.status || '').toUpperCase() === 'DECLINED');
+
+      const pendingCount = pendingApps.length;
+      const approvedCount = approvedApps.length;
+      const totalDecided = approvedCount + declinedApps.length;
+      const approvalRate = totalDecided > 0 ? Math.round((approvedCount / totalDecided) * 100) + '%' : (approvedCount > 0 ? '100%' : '100%');
+
+      let pendingVolume = 0;
+      pendingApps.forEach(a => pendingVolume += (Number(a.requestedPrincipal) || 0));
+
+      // Update KPIs
+      const kpiPending = document.getElementById('kpiPendingAppsCount');
+      const kpiVolume = document.getElementById('kpiPendingAppsVolume');
+      const kpiApproved = document.getElementById('kpiApprovedAppsCount');
+      const kpiRate = document.getElementById('kpiAppApprovalRate');
+
+      if (kpiPending) kpiPending.innerText = pendingCount;
+      if (kpiVolume) kpiVolume.innerText = formatMoney(pendingVolume);
+      if (kpiApproved) kpiApproved.innerText = approvedCount;
+      if (kpiRate) kpiRate.innerText = approvalRate;
+      
+      if (headerBadge) headerBadge.innerText = `${pendingCount} Pending`;
+      if (countBadge) countBadge.innerText = pendingCount;
+
+      // Update Navigation Tab Badge & Overview Alert
+      if (tabBadge) {
+        if (pendingCount > 0) {
+          tabBadge.style.display = 'inline-block';
+          tabBadge.innerText = pendingCount;
+        } else {
+          tabBadge.style.display = 'none';
+        }
+      }
+
+      if (overviewAlert) {
+        if (pendingCount > 0) {
+          overviewAlert.style.display = 'flex';
+          if (overviewAlertText) {
+            overviewAlertText.innerText = `You have ${pendingCount} pending borrower application(s) totaling ${formatMoney(pendingVolume)} awaiting underwriting review.`;
+          }
+        } else {
+          overviewAlert.style.display = 'none';
+        }
+      }
+
+      // Render Pending Cards
+      if (pendingApps.length === 0) {
+        container.innerHTML = `
+          <div style="text-align:center; padding:36px 20px; background:rgba(255,255,255,0.02); border:1px dashed var(--border-color); border-radius:14px;">
+            <div style="font-size:2.5rem; margin-bottom:8px;">🎉</div>
+            <h4 style="color:white; margin-bottom:4px; font-size:1.1rem;">Underwriting Inbox Clear</h4>
+            <p style="color:var(--text-muted); font-size:0.85rem; margin:0;">
+              No pending borrower applications. New requests submitted via <code style="color:#d8b4fe;">apply.html</code> will appear here automatically.
+            </p>
+          </div>
+        `;
+      } else {
+        let html = '';
+        pendingApps.forEach(app => {
+          const initials = (app.name || 'B').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+          const reqPrin = Number(app.requestedPrincipal) || 0;
+          const cleanId = String(app.id).replace(/[^a-zA-Z0-9_-]/g, '');
+
+          html += `
+            <div class="app-card" id="appCard_${cleanId}">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px;">
+                <div style="display:flex; align-items:center; gap:14px;">
+                  <div class="app-avatar">${initials}</div>
+                  <div>
+                    <h4 style="font-family:var(--font-heading); color:white; font-size:1.2rem; margin-bottom:2px;">
+                      ${escapeHtml(app.name)}
+                    </h4>
+                    <div style="display:flex; align-items:center; gap:8px; font-size:0.82rem;">
+                      <a href="mailto:${escapeHtml(app.email)}" style="color:#38bdf8; text-decoration:none;">${escapeHtml(app.email)}</a>
+                      <span style="color:var(--text-muted);">&bull;</span>
+                      <span style="color:var(--text-muted);">${escapeHtml(app.timestamp || 'Recent')}</span>
+                    </div>
+                  </div>
+                </div>
+                <div style="display:flex; gap:8px; align-items:center;">
+                  <span class="app-status-badge" style="background:rgba(251,191,36,0.15); color:#fbbf24; border:1px solid rgba(251,191,36,0.35);">
+                    ⏳ PENDING REVIEW
+                  </span>
+                  <span style="font-family:monospace; font-size:0.75rem; color:#c084fc; background:rgba(168,85,247,0.15); padding:3px 8px; border-radius:6px; border:1px solid rgba(168,85,247,0.3);">
+                    ${escapeHtml(app.id)}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Application Details Box -->
+              <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:10px; background:rgba(255,255,255,0.03); border:1px solid var(--border-color); border-radius:12px; padding:12px; box-sizing:border-box; max-width:100%;">
+                <div>
+                  <div style="font-size:0.7rem; text-transform:uppercase; color:var(--text-muted); font-weight:700;">Requested Principal</div>
+                  <div style="font-family:var(--font-heading); font-size:1.3rem; font-weight:800; color:#34d399;">
+                    ${formatMoney(reqPrin)}
+                  </div>
+                </div>
+                <div>
+                  <div style="font-size:0.7rem; text-transform:uppercase; color:var(--text-muted); font-weight:700;">Approved Credit Limit ($)</div>
+                  <input type="number" id="appLimit_${cleanId}" value="${reqPrin}" step="100" style="padding:6px 10px; background:#0f172a; border:1px solid rgba(168,85,247,0.4); border-radius:8px; color:white; font-weight:700; font-size:0.95rem; width:100%; max-width:140px; box-sizing:border-box;">
+                </div>
+                ${app.notes ? `
+                <div style="grid-column: 1 / -1;">
+                  <div style="font-size:0.7rem; text-transform:uppercase; color:var(--text-muted); font-weight:700;">Applicant Notes</div>
+                  <div style="font-size:0.85rem; color:#e2e8f0; font-style:italic; word-break:break-word;">"${escapeHtml(app.notes)}"</div>
+                </div>
+                ` : ''}
+              </div>
+
+              <!-- Action Buttons -->
+              <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; border-top:1px solid rgba(255,255,255,0.05); padding-top:14px;">
+                <div style="display:flex; gap:8px; flex-wrap:wrap; width:100%; max-width:100%;">
+                  <button class="btn-primary" id="btnApprove_${cleanId}" onclick="handleApproveApplication('${cleanId}', '${escapeHtml(app.name)}')" style="flex:1; min-width:140px; padding:10px 14px; font-size:0.85rem; background:linear-gradient(135deg, #10b981, #059669); border:none; box-shadow:0 4px 15px rgba(16,185,129,0.3);">
+                    ⚡ Approve & Activate
+                  </button>
+                  <button class="action-btn-sm btn-del" onclick="handleDeclineApplication('${cleanId}', '${escapeHtml(app.name)}')" style="padding:10px 14px; font-size:0.85rem;">
+                    ❌ Decline
+                  </button>
+                  <a href="mailto:${escapeHtml(app.email)}" class="action-btn-sm btn-edit" style="text-decoration:none; padding:10px 12px; font-size:0.85rem; display:inline-flex; align-items:center; gap:4px;">
+                    ✉️ Email
+                  </a>
+                </div>
+              </div>
+              <div id="appActionStatus_${cleanId}" style="display:none; text-align:center; font-weight:600; padding:10px; border-radius:10px; font-size:0.85rem;"></div>
+            </div>
+          `;
+        });
+        container.innerHTML = html;
+      }
+
+      // Render All Applications Table
+      if (apps.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:20px; color:var(--text-muted);">No application records found.</td></tr>';
+      } else {
+        let tableHtml = '';
+        apps.forEach(a => {
+          const s = String(a.status || 'PENDING').toUpperCase();
+          let statusBadge = '';
+          if (s === 'APPROVED') {
+            statusBadge = `<span class="app-status-badge" style="background:rgba(16,185,129,0.15); color:#34d399; border:1px solid rgba(16,185,129,0.35);">🟢 APPROVED</span>`;
+          } else if (s === 'DECLINED') {
+            statusBadge = `<span class="app-status-badge" style="background:rgba(239,68,68,0.15); color:#fca5a5; border:1px solid rgba(239,68,68,0.35);">🔴 DECLINED</span>`;
+          } else {
+            statusBadge = `<span class="app-status-badge" style="background:rgba(251,191,36,0.15); color:#fbbf24; border:1px solid rgba(251,191,36,0.35);">🟡 PENDING</span>`;
+          }
+
+          tableHtml += `
+            <tr>
+              <td style="color:var(--text-muted); font-size:0.8rem;">${escapeHtml(a.timestamp || '-')}</td>
+              <td style="font-family:monospace; font-size:0.8rem; color:#c084fc;">${escapeHtml(a.id)}</td>
+              <td><strong style="color:white;">${escapeHtml(a.name)}</strong></td>
+              <td><a href="mailto:${escapeHtml(a.email)}" style="color:#38bdf8; text-decoration:none;">${escapeHtml(a.email)}</a></td>
+              <td style="color:#34d399; font-weight:700;">${formatMoney(a.requestedPrincipal)}</td>
+              <td style="color:white; font-weight:700;">${a.approvedLimit ? formatMoney(a.approvedLimit) : '-'}</td>
+              <td>${statusBadge}</td>
+              <td style="color:var(--text-muted); font-size:0.8rem; max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${escapeHtml(a.notes || '')}">
+                ${escapeHtml(a.notes || '-')}
+              </td>
+              <td>
+                ${s === 'PENDING' ? `
+                  <button class="action-btn-sm btn-edit" onclick="handleApproveApplication('${escapeHtml(a.id)}', '${escapeHtml(a.name)}')" style="background:rgba(16,185,129,0.2); color:#6ee7b7; border-color:rgba(16,185,129,0.4);">
+                    ⚡ Approve
+                  </button>
+                ` : `<span style="color:var(--text-muted); font-size:0.75rem;">Processed</span>`}
+              </td>
+            </tr>
+          `;
+        });
+        tbody.innerHTML = tableHtml;
+      }
+    }
+
+    async function handleApproveApplication(appId, name) {
+      const limitInput = document.getElementById(`appLimit_${appId}`);
+      const approvedLimit = limitInput ? (parseFloat(limitInput.value) || 0) : 0;
+
+      if (!confirm(`⚡ Approve application for "${name}" with a starting credit line of ${formatMoney(approvedLimit)}?\n\nThis will automatically:\n1. Mark application as APPROVED\n2. Create their master ledger tab\n3. Add to Dashboard CRM\n4. Dispatch their 48-hour password activation email`)) {
+        return;
+      }
+
+      const btn = document.getElementById(`btnApprove_${appId}`);
+      const statusBox = document.getElementById(`appActionStatus_${appId}`);
+      if (btn) {
+        btn.disabled = true;
+        btn.innerText = 'Creating account & sending invite...';
+      }
+      if (statusBox) {
+        statusBox.style.display = 'block';
+        statusBox.style.background = 'rgba(168,85,247,0.15)';
+        statusBox.style.color = '#d8b4fe';
+        statusBox.innerText = '⏳ Provisioning ledger and emailing password setup link...';
+      }
+
+      try {
+        const res = await fetchBankApi('approve_application', {
+          id: appId,
+          principal: approvedLimit
+        });
+
+        if (res && res.success) {
+          if (statusBox) {
+            statusBox.style.background = 'rgba(16,185,129,0.15)';
+            statusBox.style.color = '#34d399';
+            statusBox.innerText = `✅ ${res.message || 'Application approved and account activated!'}`;
+          }
+          
+          // Optimistically update cached application
+          const target = cachedApplications.find(a => a.id === appId);
+          if (target) {
+            target.status = 'APPROVED';
+            target.approvedLimit = approvedLimit;
+            target.approvedAt = new Date().toLocaleString();
+            try {
+              localStorage.setItem('bdc_admin_applications', JSON.stringify(cachedApplications));
+            } catch(e) {}
+          }
+
+          setTimeout(() => {
+            renderApplicationsUI();
+            loadBorrowersDirectory();
+            loadDashboard();
+          }, 1200);
+        } else {
+          if (btn) {
+            btn.disabled = false;
+            btn.innerText = '⚡ Approve & Activate Account';
+          }
+          if (statusBox) {
+            statusBox.style.background = 'rgba(239,68,68,0.15)';
+            statusBox.style.color = '#fb7185';
+            statusBox.innerText = `❌ ${res ? res.message : 'Approval failed.'}`;
+          }
+        }
+      } catch(err) {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerText = '⚡ Approve & Activate Account';
+        }
+        if (statusBox) {
+          statusBox.style.background = 'rgba(239,68,68,0.15)';
+          statusBox.style.color = '#fb7185';
+          statusBox.innerText = '❌ Failed to connect to server.';
+        }
+      }
+    }
+
+    async function handleDeclineApplication(appId, name) {
+      const reason = prompt(`Reason for declining application for "${name}" (optional):`, 'Did not meet underwriting criteria');
+      if (reason === null) return; // User canceled
+
+      const statusBox = document.getElementById(`appActionStatus_${appId}`);
+      if (statusBox) {
+        statusBox.style.display = 'block';
+        statusBox.style.background = 'rgba(239,68,68,0.15)';
+        statusBox.style.color = '#fca5a5';
+        statusBox.innerText = '⏳ Updating application status...';
+      }
+
+      try {
+        const res = await fetchBankApi('decline_application', {
+          id: appId,
+          reason: reason
+        });
+
+        if (res && res.success) {
+          const target = cachedApplications.find(a => a.id === appId);
+          if (target) {
+            target.status = 'DECLINED';
+            target.notes = (target.notes ? target.notes + ' ' : '') + `[Declined: ${reason}]`;
+            try {
+              localStorage.setItem('bdc_admin_applications', JSON.stringify(cachedApplications));
+            } catch(e) {}
+          }
+          renderApplicationsUI();
+        } else {
+          alert(`❌ Decline failed: ${res ? res.message : 'Unknown error'}`);
+        }
+      } catch(err) {
+        alert('❌ Error updating application.');
+      }
     }
 
     // ==========================================
@@ -2250,6 +2741,7 @@
       
       loadDashboard();
       loadBorrowersDirectory();
+      loadApplicationsList();
     }
 
     // Auto-restore active session if already logged in
