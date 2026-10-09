@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v4.12.0] - 2026-10-08
+### Added
+- Added 1-click Delete Borrower action to Executive Center.
+- Integrated safety confirmation dialog with outstanding balance warnings.
+- Automated ledger sheet tab removal and credential revocation.
+- Deployed Google Apps Script v74 with borrower deletion.
+
 ## [v4.11.0] - 2026-10-08
 ### Added
 - Connected public apply form to live Google Sheets backend.

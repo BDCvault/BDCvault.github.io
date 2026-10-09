@@ -1,11 +1,10 @@
 {
-  "version": "4.11.0",
+  "version": "4.12.0",
   "releaseDate": "October 8, 2026",
   "notes": [
-    "Connected public apply form to live Google Sheets backend.",
-    "Added Underwriting Inbox in Executive Center with 1-click approvals.",
-    "Integrated instant email alerts to executive for new applications.",
-    "Built automatic ledger tab provisioning and password setup emails.",
-    "Added live application status badges and KPI metric cards."
+    "Added 1-click Delete Borrower action to Executive Center.",
+    "Integrated safety confirmation dialog with outstanding balance warnings.",
+    "Automated ledger sheet tab removal and credential revocation.",
+    "Deployed Google Apps Script v74 with borrower deletion."
   ]
 }

@@ -2251,8 +2251,9 @@
               <td>${renderInterestToggle(b.name, b.interestEnabled)}</td>
               <td>
                 <div style="display:flex; gap:6px;">
-                  <button class="action-btn-sm btn-edit" onclick="openBorrowerLedger('${b.name}')">📝 Ledger</button>
-                  <button class="action-btn-sm btn-edit" onclick="prefillSetPassword('${b.email}')">🔑 Pw</button>
+                  <button class="action-btn-sm btn-edit" onclick="openBorrowerLedger('${escapeHtml(b.name)}')">📝 Ledger</button>
+                  <button class="action-btn-sm btn-edit" onclick="prefillSetPassword('${escapeHtml(b.email)}')">🔑 Pw</button>
+                  <button class="action-btn-sm btn-del" onclick="confirmDeleteBorrower('${escapeHtml(b.name)}', ${b.balance || 0})" title="Delete Borrower Account">🗑️</button>
                 </div>
               </td>
             </tr>
@@ -2261,6 +2262,30 @@
         tbody.innerHTML = html;
       } catch(e) {
         tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#fb7185; padding:20px;">Failed to load borrowers.</td></tr>';
+      }
+    }
+
+    async function confirmDeleteBorrower(clientName, balance) {
+      const balNum = parseFloat(balance) || 0;
+      let warnMsg = `Are you sure you want to PERMANENTLY delete borrower "${clientName}"?\n\nThis will:\n1. Remove them from the Master Dashboard CRM.\n2. Permanently delete their dedicated ledger sheet tab.\n3. Revoke all portal login access and credentials.`;
+      if (balNum > 0) {
+        warnMsg += `\n\n⚠️ WARNING: This borrower has an outstanding balance of ${formatMoney(balNum)}!`;
+      }
+      warnMsg += `\n\nThis action cannot be undone. Proceed?`;
+
+      if (!confirm(warnMsg)) return;
+
+      try {
+        const res = await fetchBankApi('delete_borrower', { client: clientName });
+        if (res && res.success) {
+          alert(`✅ ${res.message || 'Borrower deleted successfully.'}`);
+          await loadBorrowersDirectory();
+          await loadDashboard();
+        } else {
+          alert(`❌ Deletion failed: ${res ? res.message : 'Unknown error'}`);
+        }
+      } catch (err) {
+        alert(`❌ Network or server error: ${err.message}`);
       }
     }
 
