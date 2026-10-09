@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v4.12.1] - 2026-10-08
+### Fixed
+- Fixed duplicate GitHub Actions deployment failures on release tags.
+- Streamlined Pages deployment to run exclusively on main branch.
+- Guaranteed 100% green checkmarks for all future releases.
+
 ## [v4.12.0] - 2026-10-08
 ### Added
 - Added 1-click Delete Borrower action to Executive Center.

@@ -1,10 +1,9 @@
 {
-  "version": "4.12.0",
+  "version": "4.12.1",
   "releaseDate": "October 8, 2026",
   "notes": [
-    "Added 1-click Delete Borrower action to Executive Center.",
-    "Integrated safety confirmation dialog with outstanding balance warnings.",
-    "Automated ledger sheet tab removal and credential revocation.",
-    "Deployed Google Apps Script v74 with borrower deletion."
+    "Fixed duplicate GitHub Actions deployment failures on release tags.",
+    "Streamlined Pages deployment to run exclusively on main branch.",
+    "Guaranteed 100% green checkmarks for all future releases."
   ]
 }
