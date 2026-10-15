@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v4.13.0] - 2026-10-14
+### Added
+- Added Report Payment Sent button to client portal.
+- Built payment submission modal with Cash App and Venmo.
+- Created Executive Pending Payments inbox with 1-click verification.
+- Automated ledger balance deduction and audit trail recording.
+- Added instant email alerts and official digital payment receipts.
+- Deployed Google Apps Script v75 with payment notice endpoints.
+
 ## [v4.12.1] - 2026-10-08
 ### Fixed
 - Fixed duplicate GitHub Actions deployment failures on release tags.

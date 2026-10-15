@@ -565,8 +565,8 @@
         <button class="admin-tab-btn" onclick="switchAdminSection('borrowers', this)">
           👥 Borrowers List
         </button>
-        <button class="admin-tab-btn" onclick="switchAdminSection('ledger', this)">
-          📝 Ledger & Edit Tx
+        <button class="admin-tab-btn" id="tabBtnLedger" onclick="switchAdminSection('ledger', this)">
+          📝 Ledger & Edit Tx <span id="pendingPaymentsTabBadge" style="display:none; background:#10b981; color:white; font-size:0.7rem; font-weight:800; padding:2px 6px; border-radius:10px; margin-left:4px;">0</span>
         </button>
         <button class="admin-tab-btn" onclick="switchAdminSection('accounts', this)">
           🔑 Passwords & Setup
@@ -591,6 +591,18 @@
             </div>
           </div>
           <button class="btn-primary" onclick="switchToApplicationsTab()" style="padding:8px 16px; font-size:0.85rem; background:linear-gradient(135deg, #a855f7, #6366f1);">Review Inbox ➔</button>
+        </div>
+
+        <!-- OVERVIEW PAYMENT NOTICES ALERT BANNER -->
+        <div id="overviewPaymentNoticeAlert" style="display:none; background:linear-gradient(135deg, rgba(16,185,129,0.2), rgba(5,150,105,0.2)); border:1px solid rgba(16,185,129,0.4); border-radius:16px; padding:16px 20px; margin-bottom:20px; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div style="font-size:26px;">💰</div>
+            <div>
+              <div style="color:white; font-weight:700; font-size:1rem;">Borrower Payments Reported Awaiting Verification</div>
+              <div style="color:var(--text-muted); font-size:0.85rem;" id="overviewPaymentAlertText">You have pending payment notices waiting to be credited to ledgers.</div>
+            </div>
+          </div>
+          <button class="btn-primary" onclick="switchToLedgerTab()" style="padding:8px 16px; font-size:0.85rem; background:linear-gradient(135deg, #10b981, #059669);">Review Payments ➔</button>
         </div>
 
         <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:16px; margin-bottom:24px;">
@@ -763,6 +775,27 @@
 
       <!-- SECTION 3: LEDGER & TRANSACTION EDITOR -->
       <div id="sectionLedger" style="display:none;">
+
+        <!-- PENDING PAYMENT NOTICES INBOX -->
+        <div id="pendingPaymentNoticesCard" class="card" style="margin-bottom:20px; border-color:rgba(16,185,129,0.3); background:rgba(16,185,129,0.03);">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px;">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span style="font-size:1.4rem;">💰</span>
+              <div>
+                <h4 style="font-family:var(--font-heading); font-size:1.15rem; color:white; margin:0;">
+                  Pending Payment Verifications <span id="pendingPaymentsCountBadge" style="font-size:0.75rem; background:#10b981; color:white; padding:2px 8px; border-radius:10px; margin-left:4px;">0</span>
+                </h4>
+                <p style="color:var(--text-muted); font-size:0.8rem; margin:2px 0 0 0;">Payments reported by borrowers via Cash App or Venmo awaiting your credit approval.</p>
+              </div>
+            </div>
+            <button class="action-btn-sm btn-edit" onclick="loadPaymentNoticesList()" style="padding:6px 12px; font-size:0.8rem;">🔄 Refresh</button>
+          </div>
+
+          <div id="pendingPaymentNoticesContainer">
+            <div style="text-align:center; padding:18px; color:var(--text-muted); font-size:0.85rem;">No pending payment notices. All payments up to date! 🎉</div>
+          </div>
+        </div>
+
         <div class="card" style="margin-bottom:20px;">
           <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px;">
             <div>
@@ -1290,6 +1323,7 @@
   <script>
     let cachedBorrowers = [];
     let cachedApplications = [];
+    let cachedPaymentNotices = [];
 
     function switchAdminSection(section, btn) {
       document.querySelectorAll('.admin-tab-btn').forEach(b => b.classList.remove('active'));
@@ -1305,7 +1339,10 @@
 
       if (section === 'applications') loadApplicationsList();
       if (section === 'borrowers') loadBorrowersDirectory();
-      if (section === 'ledger') loadDetailedLedger();
+      if (section === 'ledger') {
+        loadPaymentNoticesList();
+        loadDetailedLedger();
+      }
       if (section === 'accounts') loadBorrowerAccountsList();
       if (section === 'myloans') loadMyLoansSection();
     }
@@ -1313,6 +1350,124 @@
     function switchToApplicationsTab() {
       const tabBtn = document.getElementById('tabBtnApplications') || document.querySelectorAll('.admin-tab-btn')[1];
       switchAdminSection('applications', tabBtn);
+    }
+
+    function switchToLedgerTab() {
+      const tabBtn = document.getElementById('tabBtnLedger') || document.querySelectorAll('.admin-tab-btn')[3];
+      switchAdminSection('ledger', tabBtn);
+    }
+
+    // ==========================================
+    // 💰 CLIENT PAYMENT NOTICES & VERIFICATION ENGINE
+    // ==========================================
+    async function loadPaymentNoticesList() {
+      try {
+        const notices = await fetchBankApi('payment_notices') || [];
+        cachedPaymentNotices = notices;
+        renderPaymentNoticesUI();
+      } catch (e) {
+        console.warn('Failed to load payment notices:', e);
+      }
+    }
+
+    function renderPaymentNoticesUI() {
+      const pending = cachedPaymentNotices.filter(n => n.status === 'PENDING');
+      const badge = document.getElementById('pendingPaymentsCountBadge');
+      const tabBadge = document.getElementById('pendingPaymentsTabBadge');
+      const alertBanner = document.getElementById('overviewPaymentNoticeAlert');
+
+      if (badge) badge.innerText = pending.length;
+      if (tabBadge) {
+        tabBadge.innerText = pending.length;
+        tabBadge.style.display = pending.length > 0 ? 'inline-block' : 'none';
+      }
+      if (alertBanner) {
+        alertBanner.style.display = pending.length > 0 ? 'flex' : 'none';
+        const txt = document.getElementById('overviewPaymentAlertText');
+        if (txt) {
+          const totalVol = pending.reduce((sum, n) => sum + (n.amount || 0), 0);
+          txt.innerText = `${pending.length} borrower payment${pending.length === 1 ? '' : 's'} (${formatMoney(totalVol)}) awaiting verification.`;
+        }
+      }
+
+      const container = document.getElementById('pendingPaymentNoticesContainer');
+      if (!container) return;
+
+      if (pending.length === 0) {
+        container.innerHTML = '<div style="text-align:center; padding:18px; color:var(--text-muted); font-size:0.85rem;">No pending payment notices. All payments up to date! 🎉</div>';
+        return;
+      }
+
+      let html = '';
+      pending.forEach(notice => {
+        html += `
+          <div class="card" style="background:rgba(15,23,42,0.85); border:1px solid rgba(16,185,129,0.3); border-radius:14px; padding:16px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+            <div>
+              <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px; flex-wrap:wrap;">
+                <strong style="color:white; font-size:1.05rem;">${escapeHtml(notice.name)}</strong>
+                <span style="background:rgba(16,185,129,0.2); color:#6ee7b7; border:1px solid rgba(16,185,129,0.4); font-size:0.75rem; font-weight:700; padding:2px 8px; border-radius:6px;">${escapeHtml(notice.method)}</span>
+                <span style="color:#c084fc; font-family:monospace; font-size:0.75rem;">${escapeHtml(notice.id)}</span>
+              </div>
+              <div style="font-size:0.85rem; color:var(--text-muted);">
+                ${escapeHtml(notice.timestamp)} &bull; ${escapeHtml(notice.email || 'No email')}
+              </div>
+              <div style="font-size:0.85rem; color:#e2e8f0; margin-top:4px;">
+                Ref / Cashtag: <strong style="color:#38bdf8;">"${escapeHtml(notice.refNote || 'None')}"</strong>
+              </div>
+            </div>
+            <div style="display:flex; align-items:center; gap:14px;">
+              <div style="text-align:right;">
+                <div style="font-size:0.75rem; text-transform:uppercase; color:var(--text-muted); font-weight:600;">Reported</div>
+                <div style="font-family:var(--font-heading); font-size:1.5rem; font-weight:800; color:#34d399;">${formatMoney(notice.amount)}</div>
+              </div>
+              <div style="display:flex; gap:8px;">
+                <button class="btn-primary" onclick="handleApprovePaymentNotice('${notice.id}')" style="background:linear-gradient(135deg, #10b981, #059669); border:none; padding:10px 16px; font-size:0.85rem; box-shadow:0 4px 12px rgba(16,185,129,0.3);">
+                  ⚡ Confirm & Credit
+                </button>
+                <button class="action-btn-sm btn-del" onclick="handleDeclinePaymentNotice('${notice.id}')" style="padding:10px 12px; font-size:0.85rem;">
+                  🚫 Decline
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+      container.innerHTML = html;
+    }
+
+    async function handleApprovePaymentNotice(noticeId) {
+      if (!confirm(`Are you sure you verified receipt of funds for notice ${noticeId} and want to credit it to the borrower's ledger?`)) return;
+
+      try {
+        const res = await fetchBankApi('approve_payment_notice', { id: noticeId });
+        if (res && res.success) {
+          alert(`✅ ${res.message || 'Payment credited to ledger successfully!'}`);
+          await loadPaymentNoticesList();
+          await loadDashboard();
+          await loadDetailedLedger();
+        } else {
+          alert(`❌ Failed: ${res ? res.message : 'Unknown error'}`);
+        }
+      } catch (err) {
+        alert(`❌ Network or server error: ${err.message}`);
+      }
+    }
+
+    async function handleDeclinePaymentNotice(noticeId) {
+      const reason = prompt('Enter a reason for declining this payment notice (optional):');
+      if (reason === null) return;
+
+      try {
+        const res = await fetchBankApi('decline_payment_notice', { id: noticeId, reason: reason });
+        if (res && res.success) {
+          alert(`✅ Payment notice ${noticeId} marked as declined.`);
+          await loadPaymentNoticesList();
+        } else {
+          alert(`❌ Failed: ${res ? res.message : 'Unknown error'}`);
+        }
+      } catch (err) {
+        alert(`❌ Network or server error: ${err.message}`);
+      }
     }
 
     // ==========================================
@@ -2832,6 +2987,10 @@
         });
         actContainer.innerHTML = html;
       }
+
+      // 4. Update Pending Badges and Alerts
+      loadPaymentNoticesList();
+      loadApplicationsList();
     }
   </script>
 </body>

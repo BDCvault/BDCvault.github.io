@@ -107,22 +107,91 @@
       </div>
 
       <!-- ACTION BUTTONS -->
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:30px;" id="actionButtons">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:24px;" id="actionButtons">
         <a href="https://cash.app/$BrianDivaCox" target="_blank" class="btn-cashapp">
-          💸 Cash App
+          💸 Pay with Cash App
         </a>
         <a href="https://venmo.com/u/BrianDivaCox" target="_blank" style="background:#008CFF; color:white; padding:14px; border-radius:12px; font-weight:700; text-decoration:none; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:0 4px 15px rgba(0,140,255,0.25);">
-          📱 Venmo
+          📱 Pay with Venmo
         </a>
-        <button class="btn-primary" onclick="downloadPDF()" style="grid-column: span 2;">
+        <button class="btn-primary" id="btnOpenReportPayment" onclick="openReportPaymentModal()" style="grid-column: span 2; background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.35); font-size:1rem; padding:14px;">
+          📤 I Sent a Payment (Report for Credit)
+        </button>
+        <button class="btn-primary" onclick="downloadPDF()" style="grid-column: span 2; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); box-shadow: none;">
           📑 Download PDF Statement
         </button>
+      </div>
+
+      <!-- REPORT PAYMENT MODAL OVERLAY -->
+      <div id="reportPaymentModal" class="modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); backdrop-filter:blur(10px); z-index:99999; justify-content:center; align-items:center; padding:16px; box-sizing:border-box;">
+        <div class="card" style="max-width:440px; width:100%; margin:0; border:1px solid rgba(168,85,247,0.5); box-shadow:0 25px 60px rgba(0,0,0,0.8); position:relative; box-sizing:border-box;">
+          <button onclick="closeReportPaymentModal()" style="position:absolute; top:16px; right:16px; background:none; border:none; color:var(--text-muted); font-size:1.6rem; cursor:pointer; line-height:1;">&times;</button>
+          
+          <div style="text-align:center; margin-bottom:18px;">
+            <div style="font-size:2.4rem; margin-bottom:6px;">📤</div>
+            <h3 style="font-family:var(--font-heading); color:white; font-size:1.3rem; margin:0;">Report Sent Payment</h3>
+            <p style="color:var(--text-muted); font-size:0.82rem; margin-top:4px;">Notify administration to verify and credit your ledger balance.</p>
+          </div>
+
+          <form id="reportPaymentForm" onsubmit="handleReportPaymentSubmit(event)">
+            <div class="form-group" style="margin-bottom:14px; text-align:left;">
+              <label style="display:block; font-size:0.8rem; color:#cbd5e1; font-weight:600; margin-bottom:6px;">Payment Method</label>
+              <select id="reportPmtMethod" style="width:100%; padding:12px; background:rgba(15,23,42,0.9); border:1px solid var(--border-color); border-radius:10px; color:white; font-weight:600; box-sizing:border-box;">
+                <option value="Cash App">💸 Cash App ($BrianDivaCox)</option>
+                <option value="Venmo">📱 Venmo (@BrianDivaCox)</option>
+              </select>
+            </div>
+
+            <div class="form-group" style="margin-bottom:14px; text-align:left;">
+              <label style="display:block; font-size:0.8rem; color:#cbd5e1; font-weight:600; margin-bottom:6px;">Amount Sent ($)</label>
+              <input type="number" step="0.01" id="reportPmtAmount" required placeholder="e.g. 150.00" style="width:100%; padding:12px; background:rgba(15,23,42,0.9); border:1px solid var(--border-color); border-radius:10px; color:white; font-weight:700; font-size:1.1rem; box-sizing:border-box;">
+            </div>
+
+            <div class="form-group" style="margin-bottom:20px; text-align:left;">
+              <label style="display:block; font-size:0.8rem; color:#cbd5e1; font-weight:600; margin-bottom:6px;">Your Cashtag / Handle or Reference Note</label>
+              <input type="text" id="reportPmtRef" placeholder="e.g. $JohnDoe or Oct payment" style="width:100%; padding:12px; background:rgba(15,23,42,0.9); border:1px solid var(--border-color); border-radius:10px; color:white; box-sizing:border-box;">
+            </div>
+
+            <button type="submit" id="btnSubmitReportPmt" class="btn-primary" style="width:100%; padding:14px; background:linear-gradient(135deg, #10b981 0%, #059669 100%); font-size:1rem; font-weight:700;">
+              ⚡ Submit Payment Notice ➔
+            </button>
+          </form>
+
+          <!-- RECEIPT / CONFIRMATION BOX -->
+          <div id="reportPaymentReceipt" style="display:none; text-align:center; padding:10px 0;">
+            <div style="font-size:2.4rem; margin-bottom:8px;">✅</div>
+            <h4 style="color:#34d399; font-size:1.2rem; margin:0 0 6px 0;">Payment Notice Received!</h4>
+            <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:16px; margin:14px 0; text-align:left; font-size:0.85rem;">
+              <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                <span style="color:var(--text-muted);">Notice ID:</span>
+                <strong id="receiptNoticeId" style="color:#c084fc; font-family:monospace;">PMT-000000</strong>
+              </div>
+              <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                <span style="color:var(--text-muted);">Amount:</span>
+                <strong id="receiptAmount" style="color:#34d399; font-size:1.05rem;">$0.00</strong>
+              </div>
+              <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                <span style="color:var(--text-muted);">Method:</span>
+                <span id="receiptMethod" style="color:white; font-weight:600;">Cash App</span>
+              </div>
+              <div style="display:flex; justify-content:space-between;">
+                <span style="color:var(--text-muted);">Status:</span>
+                <span style="background:rgba(234,179,8,0.15); color:#fde047; padding:2px 8px; border-radius:6px; font-weight:700; font-size:0.75rem;">PENDING VERIFICATION</span>
+              </div>
+            </div>
+            <p style="color:var(--text-muted); font-size:0.8rem; line-height:1.4; margin-bottom:16px;">
+              Your administrator has been notified. Your ledger running balance will be credited once the deposit is confirmed.
+            </p>
+            <button onclick="closeReportPaymentModal()" class="btn-primary" style="width:100%; padding:12px;">Done</button>
+          </div>
+
+        </div>
       </div>
 
     </div>
 
     <footer>
-      BDC Vault <span class="bdc-version-tag" style="color:#c084fc; font-weight:700; cursor:pointer;">v4.7.0</span> &bull; Official Client Portal
+      BDC Vault <span class="bdc-version-tag" style="color:#c084fc; font-weight:700; cursor:pointer;">v4.13.0</span> &bull; Official Client Portal
     </footer>
 
   </div>
@@ -133,6 +202,7 @@
     // 1. Enforce Mandatory Authentication
     const sessionRaw = sessionStorage.getItem('bdc_client_session');
     let authenticatedClient = null;
+    let authenticatedEmail = null;
 
     if (!sessionRaw) {
       // Redirect unauthenticated visitor to login
@@ -141,11 +211,69 @@
       try {
         const session = JSON.parse(sessionRaw);
         authenticatedClient = session.clientName;
+        authenticatedEmail = session.email || '';
         if (!authenticatedClient) {
           window.location.replace('login.html?msg=unauthorized');
         }
       } catch(e) {
         window.location.replace('login.html?msg=unauthorized');
+      }
+    }
+
+    function openReportPaymentModal() {
+      const modal = document.getElementById('reportPaymentModal');
+      document.getElementById('reportPaymentForm').style.display = 'block';
+      document.getElementById('reportPaymentReceipt').style.display = 'none';
+      document.getElementById('reportPmtAmount').value = '';
+      document.getElementById('reportPmtRef').value = '';
+      modal.style.display = 'flex';
+    }
+
+    function closeReportPaymentModal() {
+      document.getElementById('reportPaymentModal').style.display = 'none';
+    }
+
+    async function handleReportPaymentSubmit(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btnSubmitReportPmt');
+      const amount = parseFloat(document.getElementById('reportPmtAmount').value);
+      const method = document.getElementById('reportPmtMethod').value;
+      const refNote = document.getElementById('reportPmtRef').value;
+
+      if (!amount || amount <= 0) {
+        alert('Please enter a valid amount greater than $0.');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerText = 'Transmitting Notice...';
+
+      try {
+        const payload = {
+          client: authenticatedClient,
+          email: authenticatedEmail || '',
+          amount: amount,
+          method: method,
+          ref: refNote
+        };
+
+        const res = await fetchBankApi('report_payment', payload);
+        btn.disabled = false;
+        btn.innerText = '⚡ Submit Payment Notice ➔';
+
+        if (res && res.success) {
+          document.getElementById('reportPaymentForm').style.display = 'none';
+          document.getElementById('receiptNoticeId').innerText = res.noticeId || 'PMT-CONFIRMED';
+          document.getElementById('receiptAmount').innerText = formatMoney(amount);
+          document.getElementById('receiptMethod').innerText = method;
+          document.getElementById('reportPaymentReceipt').style.display = 'block';
+        } else {
+          alert('❌ Submission error: ' + (res ? res.message : 'Unknown error'));
+        }
+      } catch (err) {
+        btn.disabled = false;
+        btn.innerText = '⚡ Submit Payment Notice ➔';
+        alert('❌ Network or server error: ' + err.message);
       }
     }
 

@@ -1,9 +1,9 @@
 {
-  "version": "4.12.1",
-  "releaseDate": "October 8, 2026",
+  "version": "4.13.0",
+  "releaseDate": "October 14, 2026",
   "notes": [
-    "Fixed duplicate GitHub Actions deployment failures on release tags.",
-    "Streamlined Pages deployment to run exclusively on main branch.",
-    "Guaranteed 100% green checkmarks for all future releases."
+    "Added Report Payment Sent action to borrower portal.",
+    "Built Executive Pending Payment Verifications inbox with 1-click approvals.",
+    "Automated balance deduction and instant borrower payment receipts."
   ]
 }

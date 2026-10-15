@@ -31,6 +31,7 @@
 
 | Version | Release Date | Summary of Features & Fixes |
 | :--- | :--- | :--- |
+| **`v4.13.0`** | Oct 14, 2026 | Added Client Payment Reporting & Executive 1-Click Verification Pipeline. |
 | **`v4.12.1`** | Oct 8, 2026 | Fixed duplicate GitHub Actions deployment failures on release tags. |
 | **`v4.12.0`** | Oct 8, 2026 | Added 1-Click Borrower Deletion engine with safety dialog to Executive Center. |
 | **`v4.11.0`** | Oct 8, 2026 | Added live account application pipeline and Underwriting Inbox to Executive Center. |
