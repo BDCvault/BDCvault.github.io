@@ -108,8 +108,8 @@
 
       <!-- ACTION BUTTONS -->
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:24px;" id="actionButtons">
-        <a href="https://cash.app/$BrianDivaCox" target="_blank" class="btn-cashapp">
-          💸 Pay with Cash App
+        <a href="https://cash.app/$Tyeesylvester" target="_blank" class="btn-cashapp">
+          💸 Pay with Cash App ($Tyeesylvester)
         </a>
         <a href="https://venmo.com/u/BrianDivaCox" target="_blank" style="background:#008CFF; color:white; padding:14px; border-radius:12px; font-weight:700; text-decoration:none; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:0 4px 15px rgba(0,140,255,0.25);">
           📱 Pay with Venmo
@@ -137,7 +137,7 @@
             <div class="form-group" style="margin-bottom:14px; text-align:left;">
               <label style="display:block; font-size:0.8rem; color:#cbd5e1; font-weight:600; margin-bottom:6px;">Payment Method</label>
               <select id="reportPmtMethod" style="width:100%; padding:12px; background:rgba(15,23,42,0.9); border:1px solid var(--border-color); border-radius:10px; color:white; font-weight:600; box-sizing:border-box;">
-                <option value="Cash App">💸 Cash App ($BrianDivaCox)</option>
+                <option value="Cash App (Tyeesylvester)">💸 Cash App (Tyeesylvester)</option>
                 <option value="Venmo">📱 Venmo (@BrianDivaCox)</option>
               </select>
             </div>
@@ -313,7 +313,7 @@
       document.getElementById('portalContent').style.display = 'block';
 
       let ledger = (data && data.ledger) ? data.ledger : [
-        [new Date().toLocaleDateString(), "Payment", "Cash App Settlement", 250, 4750],
+        [new Date().toLocaleDateString(), "Payment", "Cash App (Tyeesylvester) Settlement", 250, 4750],
         [new Date().toLocaleDateString(), "Interest", "Monthly Accrued Interest (27.9% APR)", 116.25, 5000],
         [new Date().toLocaleDateString(), "Loan", "Starting Loan Principal", 5000, 5000]
       ];

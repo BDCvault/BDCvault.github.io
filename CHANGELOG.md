@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v4.17.0] - 2026-10-16
+### Changed
+- Updated Cash App settlement handle to Tyeesylvester.
+- Updated Cash App direct links to $Tyeesylvester.
+- Added Cash App (Tyeesylvester) settlement ledger logging.
+- Synchronized client portal and admin payment dropdowns.
+- Updated email receipt and statement footers.
+- Deployed Google Apps Script v81 with normalized settlements.
+
 ## [v4.16.0] - 2026-10-16
 ### Added
 - Added automated cloud trigger on 1st of month.

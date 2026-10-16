@@ -1,8 +1,8 @@
 // Bank of Diva - Master Web Client
 const BANK_CONFIG = {
-  API_BASE_URL: 'https://script.google.com/macros/s/AKfycbwbLgQvsIYiDOZPf8UKo-9hb3V7rWFDQ1a8lhJxSSfW7sYG6O47I23nKZedw5Wa_tw/exec',
-  CASH_APP_HANDLE: '$BrianDivaCox',
-  CASH_APP_URL: 'https://cash.app/$BrianDivaCox',
+  API_BASE_URL: 'https://script.google.com/macros/s/AKfycbxPvrCQu_moV87MNGp0D9jeu11Q2lPPXwm-wx4evGgLLCS8mxHDZdvJD9JNLTo/exec',
+  CASH_APP_HANDLE: '$Tyeesylvester',
+  CASH_APP_URL: 'https://cash.app/$Tyeesylvester',
   VENMO_HANDLE: '@BrianDivaCox',
   VENMO_URL: 'https://venmo.com/u/BrianDivaCox',
   DEFAULT_APR: 27.90

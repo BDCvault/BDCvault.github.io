@@ -20,7 +20,7 @@
 * **🔑 Secure Borrower Authentication**: Email and password login with salted SHA-256 encryption and one-time password setup links.
 * **👥 Borrower Directory & Ledger Editor**: Live user account management with inline transaction editing and balance recalculation.
 * **📱 Progressive Web App (PWA)**: Installable on iOS, Android, macOS, and Windows with offline caching and wosBDC live update alerts.
-* **💸 1-Click Payments**: Instant Cash App (`$BrianDivaCox`) & Venmo (`@BrianDivaCox`) integration.
+* **💸 1-Click Payments**: Instant Cash App (`$Tyeesylvester`) & Venmo (`@BrianDivaCox`) integration.
 * **📑 1-Click PDF Statements**: Watermarked official BDC Vault statement generator.
 * **🔒 Executive Command Center**: Firebase Google Auth, portfolio metrics, live transaction logging, 27.9% APR engine, and $40 late fee bot.
 * **📧 Branded HTML Emails**: Responsive email templates for monthly statements, receipts, and late fee warnings.
@@ -31,6 +31,7 @@
 
 | Version | Release Date | Summary of Features & Fixes |
 | :--- | :--- | :--- |
+| **`v4.17.0`** | Oct 16, 2026 | Updated Cash App settlement to Tyeesylvester and synchronized payment links. |
 | **`v4.16.0`** | Oct 16, 2026 | Added automated cloud trigger on 1st of month at 1:00 AM (hands-free). |
 | **`v4.15.0`** | Oct 16, 2026 | Consolidated Borrowers and Passwords into unified Accounts directory. |
 | **`v4.14.0`** | Oct 15, 2026 | Added Instant Account Provisioning & Recurring Monthly Invoicing Engine. |

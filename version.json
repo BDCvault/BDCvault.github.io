@@ -1,10 +1,10 @@
 {
-  "version": "4.16.0",
+  "version": "4.17.0",
   "releaseDate": "October 16, 2026",
   "notes": [
-    "Added automated cloud trigger on 1st of month.",
-    "Recurring bills post hands-free at 1:00 AM.",
-    "Ensures borrowers have 10-day window to pay.",
-    "Added automated cloud trigger status badge."
+    "Updated Cash App settlement handle to Tyeesylvester.",
+    "Updated Cash App direct links to $Tyeesylvester.",
+    "Added Cash App (Tyeesylvester) settlement ledger logging.",
+    "Synchronized client portal and admin payment dropdowns."
   ]
 }
