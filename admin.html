@@ -562,23 +562,20 @@
         <button class="admin-tab-btn" id="tabBtnApplications" onclick="switchAdminSection('applications', this)">
           📥 Applications <span id="pendingAppsTabBadge" style="display:none; background:#ef4444; color:white; font-size:0.7rem; font-weight:800; padding:2px 6px; border-radius:10px; margin-left:4px;">0</span>
         </button>
-        <button class="admin-tab-btn" onclick="switchAdminSection('borrowers', this)">
-          👥 Borrowers List
+        <button class="admin-tab-btn" id="tabBtnAccounts" onclick="switchAdminSection('accounts', this)">
+          👥 Accounts & Borrowers
         </button>
         <button class="admin-tab-btn" id="tabBtnLedger" onclick="switchAdminSection('ledger', this)">
           📝 Ledger & Edit Tx <span id="pendingPaymentsTabBadge" style="display:none; background:#10b981; color:white; font-size:0.7rem; font-weight:800; padding:2px 6px; border-radius:10px; margin-left:4px;">0</span>
         </button>
-        <button class="admin-tab-btn" onclick="switchAdminSection('accounts', this)">
-          🔑 Passwords & Setup
+        <button class="admin-tab-btn" id="tabBtnRecurring" onclick="switchAdminSection('recurring', this)">
+          🔁 Recurring Bills
         </button>
         <button class="admin-tab-btn" onclick="switchAdminSection('emails', this)">
           📧 Email Suite
         </button>
         <button class="admin-tab-btn" onclick="switchAdminSection('myloans', this)">
           💸 Loans I Owe
-        </button>
-        <button class="admin-tab-btn" id="tabBtnRecurring" onclick="switchAdminSection('recurring', this)">
-          🔁 Recurring Bills
         </button>
       </div>
 
@@ -745,31 +742,42 @@
       </div>
 
       <!-- SECTION 3: BORROWERS DIRECTORY (LIST OF USERS) -->
-      <div id="sectionBorrowers" style="display:none;">
+      <!-- SECTION: ACCOUNTS & BORROWERS DIRECTORY -->
+      <div id="sectionAccounts" style="display:none;">
         <div class="card">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; flex-wrap:wrap; gap:12px;">
             <div>
-              <h3 style="font-family:var(--font-heading); font-size:1.3rem; color:white; margin-bottom:4px;">👥 Borrower Directory</h3>
-              <p style="color:var(--text-muted); font-size:0.85rem;">All active client accounts registered in BDC Vault.</p>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <h3 style="font-family:var(--font-heading); font-size:1.3rem; color:white; margin:0;">👥 Accounts & Borrowers Directory</h3>
+                <span id="accountsCountBadge" style="background:rgba(168,85,247,0.2); color:#d8b4fe; border:1px solid rgba(168,85,247,0.4); font-size:0.75rem; font-weight:700; padding:2px 8px; border-radius:12px;">0 Accounts</span>
+              </div>
+              <p style="color:var(--text-muted); font-size:0.85rem; margin:4px 0 0 0;">Unified master directory for client profiles, credential dispatch, ledger resets, and interest switches.</p>
             </div>
-            <button class="btn-primary" onclick="loadBorrowersDirectory()" style="padding:8px 16px; font-size:0.85rem;">🔄 Refresh</button>
+            <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+              <button class="btn-primary" onclick="openProvisionAccountModal()" style="padding:9px 16px; font-size:0.85rem; background:linear-gradient(135deg, #a855f7, #6366f1);">
+                ➕ Provision New Account
+              </button>
+              <button class="action-btn-sm btn-edit" onclick="loadAccountsDirectory()" style="padding:9px 14px; font-size:0.85rem;">
+                🔄 Refresh Directory
+              </button>
+            </div>
           </div>
 
           <div style="overflow-x:auto;">
-            <table class="data-table" id="borrowerTable">
+            <table class="data-table" id="accountsTable">
               <thead>
                 <tr>
-                  <th>Borrower</th>
-                  <th>Email</th>
-                  <th>Current Balance</th>
+                  <th>Borrower / Client</th>
+                  <th>Email Address</th>
                   <th>Starting Principal</th>
+                  <th>Current Balance</th>
                   <th>Status</th>
                   <th>27.90% APR</th>
                   <th>Actions</th>
                 </tr>
               </thead>
-              <tbody id="borrowerTableBody">
-                <tr><td colspan="7" style="text-align:center; padding:20px; color:var(--text-muted);">Loading borrower accounts...</td></tr>
+              <tbody id="accountsTableBody">
+                <tr><td colspan="7" style="text-align:center; padding:20px; color:var(--text-muted);">Loading accounts directory...</td></tr>
               </tbody>
             </table>
           </div>
@@ -869,102 +877,7 @@
         </div>
       </div>
 
-      <!-- SECTION 4: PASSWORDS & BORROWER SETUP -->
-      <div id="sectionAccounts" style="display:none;">
-        
-        <!-- CARD A: LIVE BORROWER ACCOUNTS DIRECTORY & QUICK DISPATCH -->
-        <div class="card" style="margin-bottom:20px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:10px;">
-            <div>
-              <h3 style="font-family:var(--font-heading); font-size:1.25rem; margin-bottom:4px; color:white;">👥 Active Borrower Accounts</h3>
-              <p style="color:var(--text-muted); font-size:0.85rem; margin:0;">
-                All borrowers in your database. Dispatch setup invitations or configure passwords with 1 click.
-              </p>
-            </div>
-            <button class="action-btn-sm btn-edit" onclick="loadBorrowerAccountsList()" style="padding:8px 14px; font-size:0.85rem;">🔄 Refresh Users</button>
-          </div>
 
-          <div style="overflow-x:auto;">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>Borrower</th>
-                  <th>Email Address</th>
-                  <th>Starting Principal</th>
-                  <th>Current Balance</th>
-                  <th>Auth Status</th>
-                  <th>27.90% APR</th>
-                  <th>Quick Actions</th>
-                </tr>
-              </thead>
-              <tbody id="borrowerAccountsTableBody">
-                <tr><td colspan="7" style="text-align:center; padding:20px; color:var(--text-muted);">Loading registered borrowers...</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- CARD B: SEND EMAIL ACTIVATION INVITATION (AUTO-LOADED) -->
-        <div class="card" style="margin-bottom:20px;">
-          <h3 style="font-family:var(--font-heading); font-size:1.25rem; margin-bottom:8px; color:white;">✉️ Send Account Activation & Password Setup Email</h3>
-          <p style="color:var(--text-muted); font-size:0.88rem; margin-bottom:16px;">
-            Dispatches a branded BDC Vault invitation email with an encrypted 48-hour password setup link.
-          </p>
-
-          <div class="form-group" style="margin-bottom:16px;">
-            <label style="color:#d8b4fe; font-weight:700;">⚡ Choose Borrower from Database (Auto-Fills Form)</label>
-            <select id="accountBorrowerSelect" onchange="onAccountBorrowerSelected(this.value)" style="width:100%; border-color:rgba(168,85,247,0.4); background:rgba(15,23,42,0.9); font-weight:600; color:white;">
-              <option value="">-- Select a Borrower to Auto-Fill --</option>
-            </select>
-          </div>
-
-          <form onsubmit="handleAdminSendInvite(event)">
-            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px;">
-              <div class="form-group">
-                <label>Borrower Name</label>
-                <input type="text" id="adminInviteName" placeholder="e.g. Crystal" required>
-              </div>
-              <div class="form-group">
-                <label>Email Address</label>
-                <input type="email" id="adminInviteEmail" placeholder="e.g. crystal@example.com" required>
-              </div>
-              <div class="form-group">
-                <label>Starting Principal ($)</label>
-                <input type="number" id="adminInvitePrincipal" placeholder="e.g. 5000">
-              </div>
-            </div>
-            <button type="submit" id="btnAdminInvite" class="btn-primary" style="width:100%; margin-top:10px;">
-              📧 Dispatch Activation Email
-            </button>
-            <div id="adminInviteStatus" style="text-align:center; margin-top:12px; font-weight:600; display:none; padding:10px; border-radius:10px;"></div>
-          </form>
-        </div>
-
-        <!-- CARD C: DIRECT SET PASSWORD -->
-        <div class="card">
-          <h3 style="font-family:var(--font-heading); font-size:1.25rem; margin-bottom:8px; color:white;">⚡ Set / Change Borrower Password</h3>
-          <p style="color:var(--text-muted); font-size:0.88rem; margin-bottom:16px;">
-            Directly configure a password for any borrower so they can log in immediately.
-          </p>
-          <form onsubmit="handleAdminSetPassword(event)">
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
-              <div class="form-group">
-                <label>Borrower Email Address</label>
-                <input type="email" id="adminSetEmail" placeholder="e.g. borrower@example.com" required>
-              </div>
-              <div class="form-group">
-                <label>New Password</label>
-                <input type="text" id="adminSetNewPw" placeholder="e.g. Vault2026!" minlength="6" required>
-              </div>
-            </div>
-            <button type="submit" id="btnAdminSetPw" class="btn-primary" style="width:100%; margin-top:10px;">
-              🔑 Update Password in Database
-            </button>
-            <div id="adminSetPwStatus" style="text-align:center; margin-top:12px; font-weight:600; display:none; padding:10px; border-radius:10px;"></div>
-          </form>
-        </div>
-
-      </div>
 
       <!-- SECTION 5: EMAIL SHOWCASE SUITE -->
       <div id="sectionEmails" style="display:none;">
@@ -1418,8 +1331,76 @@
       </div>
     </div>
 
+    <!-- PROVISION NEW ACCOUNT MODAL -->
+    <div id="provisionAccountModal" class="modal-overlay" style="display:none;">
+      <div class="modal-box" style="max-width:520px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <h3 style="font-family:var(--font-heading); color:white; margin:0;">➕ Provision New Account / Client</h3>
+          <button type="button" onclick="closeProvisionAccountModal()" style="background:transparent; border:none; color:var(--text-muted); font-size:1.4rem; cursor:pointer;">&times;</button>
+        </div>
+        <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:18px;">
+          Instantly provisions a ledger tab, creates an authentication record, and dispatches an encrypted 48-hour password setup link.
+        </p>
+        <form onsubmit="handleAdminProvisionClient(event)">
+          <div class="form-group" style="margin-bottom:14px;">
+            <label>Client / Borrower Name</label>
+            <input type="text" id="adminInviteName" placeholder="e.g. Ann Cox" required>
+          </div>
+          <div class="form-group" style="margin-bottom:14px;">
+            <label>Email Address</label>
+            <input type="email" id="adminInviteEmail" placeholder="e.g. ann@example.com" required>
+          </div>
+          <div class="form-group" style="margin-bottom:18px;">
+            <label>Starting Principal ($)</label>
+            <input type="number" step="0.01" id="adminInvitePrincipal" placeholder="0.00 (leave 0 for monthly bills/expenses)">
+          </div>
+          <div style="display:flex; gap:10px;">
+            <button type="submit" id="btnAdminInvite" class="btn-primary" style="flex:1; background:linear-gradient(135deg, #a855f7, #6366f1);">
+              🚀 Provision & Send Link
+            </button>
+            <button type="button" onclick="closeProvisionAccountModal()" style="background:rgba(255,255,255,0.08); color:white; border:1px solid var(--border-color); padding:10px 18px; border-radius:12px; font-weight:600; cursor:pointer;">
+              Cancel
+            </button>
+          </div>
+          <div id="adminInviteStatus" style="text-align:center; margin-top:12px; font-weight:600; display:none; padding:10px; border-radius:10px;"></div>
+        </form>
+      </div>
+    </div>
+
+    <!-- DIRECT SET PASSWORD MODAL -->
+    <div id="directPasswordModal" class="modal-overlay" style="display:none;">
+      <div class="modal-box" style="max-width:460px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <h3 style="font-family:var(--font-heading); color:white; margin:0;">🔑 Set / Change Borrower Password</h3>
+          <button type="button" onclick="closeDirectPasswordModal()" style="background:transparent; border:none; color:var(--text-muted); font-size:1.4rem; cursor:pointer;">&times;</button>
+        </div>
+        <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:18px;">
+          Directly configure or override credentials for immediate client login.
+        </p>
+        <form onsubmit="handleAdminDirectSetPassword(event)">
+          <div class="form-group" style="margin-bottom:14px;">
+            <label>Borrower Email Address</label>
+            <input type="email" id="adminSetEmail" placeholder="e.g. borrower@example.com" required>
+          </div>
+          <div class="form-group" style="margin-bottom:18px;">
+            <label>New Password</label>
+            <input type="text" id="adminSetNewPw" placeholder="e.g. Vault2026!" minlength="6" required>
+          </div>
+          <div style="display:flex; gap:10px;">
+            <button type="submit" id="btnAdminSetPw" class="btn-primary" style="flex:1;">
+              🔑 Update Password
+            </button>
+            <button type="button" onclick="closeDirectPasswordModal()" style="background:rgba(255,255,255,0.08); color:white; border:1px solid var(--border-color); padding:10px 18px; border-radius:12px; font-weight:600; cursor:pointer;">
+              Cancel
+            </button>
+          </div>
+          <div id="adminSetPwStatus" style="text-align:center; margin-top:12px; font-weight:600; display:none; padding:10px; border-radius:10px;"></div>
+        </form>
+      </div>
+    </div>
+
     <footer>
-      BDC Vault <span class="bdc-version-tag" style="color:#c084fc; font-weight:700; cursor:pointer;">v4.10.0</span> &bull; Executive Command Center
+      BDC Vault <span class="bdc-version-tag" style="color:#c084fc; font-weight:700; cursor:pointer;">v4.15.0</span> &bull; Executive Command Center
     </footer>
 
   </div>
@@ -1435,33 +1416,39 @@
       document.querySelectorAll('.admin-tab-btn').forEach(b => b.classList.remove('active'));
       if (btn) btn.classList.add('active');
 
-      document.getElementById('sectionOverview').style.display = (section === 'overview') ? 'block' : 'none';
-      document.getElementById('sectionApplications').style.display = (section === 'applications') ? 'block' : 'none';
-      document.getElementById('sectionBorrowers').style.display = (section === 'borrowers') ? 'block' : 'none';
-      document.getElementById('sectionLedger').style.display = (section === 'ledger') ? 'block' : 'none';
-      document.getElementById('sectionAccounts').style.display = (section === 'accounts') ? 'block' : 'none';
-      document.getElementById('sectionEmails').style.display = (section === 'emails') ? 'block' : 'none';
-      document.getElementById('sectionMyLoans').style.display = (section === 'myloans') ? 'block' : 'none';
-      document.getElementById('sectionRecurring').style.display = (section === 'recurring') ? 'block' : 'none';
+      const secOverview = document.getElementById('sectionOverview');
+      const secApplications = document.getElementById('sectionApplications');
+      const secAccounts = document.getElementById('sectionAccounts');
+      const secLedger = document.getElementById('sectionLedger');
+      const secEmails = document.getElementById('sectionEmails');
+      const secMyLoans = document.getElementById('sectionMyLoans');
+      const secRecurring = document.getElementById('sectionRecurring');
+
+      if (secOverview) secOverview.style.display = (section === 'overview') ? 'block' : 'none';
+      if (secApplications) secApplications.style.display = (section === 'applications') ? 'block' : 'none';
+      if (secAccounts) secAccounts.style.display = (section === 'accounts' || section === 'borrowers') ? 'block' : 'none';
+      if (secLedger) secLedger.style.display = (section === 'ledger') ? 'block' : 'none';
+      if (secEmails) secEmails.style.display = (section === 'emails') ? 'block' : 'none';
+      if (secMyLoans) secMyLoans.style.display = (section === 'myloans') ? 'block' : 'none';
+      if (secRecurring) secRecurring.style.display = (section === 'recurring') ? 'block' : 'none';
 
       if (section === 'applications') loadApplicationsList();
-      if (section === 'borrowers') loadBorrowersDirectory();
+      if (section === 'accounts' || section === 'borrowers') loadAccountsDirectory();
       if (section === 'ledger') {
         loadPaymentNoticesList();
         loadDetailedLedger();
       }
-      if (section === 'accounts') loadBorrowerAccountsList();
       if (section === 'myloans') loadMyLoansSection();
       if (section === 'recurring') loadRecurringInvoices();
     }
 
     function switchToApplicationsTab() {
-      const tabBtn = document.getElementById('tabBtnApplications') || document.querySelectorAll('.admin-tab-btn')[1];
+      const tabBtn = document.getElementById('tabBtnApplications');
       switchAdminSection('applications', tabBtn);
     }
 
     function switchToLedgerTab() {
-      const tabBtn = document.getElementById('tabBtnLedger') || document.querySelectorAll('.admin-tab-btn')[3];
+      const tabBtn = document.getElementById('tabBtnLedger');
       switchAdminSection('ledger', tabBtn);
     }
 
@@ -2488,34 +2475,42 @@
       `;
     }
 
-    // --- 1. BORROWERS DIRECTORY ---
-    async function loadBorrowersDirectory() {
-      const tbody = document.getElementById('borrowerTableBody');
-      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:var(--text-muted);">Fetching borrower directory from master ledger...</td></tr>';
+    // --- 1. ACCOUNTS & BORROWERS DIRECTORY ---
+    async function loadAccountsDirectory() {
+      const tbody = document.getElementById('accountsTableBody');
+      const countBadge = document.getElementById('accountsCountBadge');
+      if (!tbody) return;
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:var(--text-muted);">Fetching accounts directory from master ledger...</td></tr>';
       
       try {
         const borrowers = await fetchBankApi('borrowers') || [];
         cachedBorrowers = borrowers;
         
+        if (countBadge) {
+          countBadge.innerText = `${borrowers.length} Account${borrowers.length === 1 ? '' : 's'}`;
+        }
+        
         if (borrowers.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:var(--text-muted);">No borrowers found.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:var(--text-muted);">No accounts found.</td></tr>';
           return;
         }
 
         let html = '';
         borrowers.forEach(b => {
+          const emailDisplay = b.email ? `<span style="color:#cbd5e1;">${escapeHtml(b.email)}</span>` : `<span style="color:#fb7185; font-style:italic;">No Email Listed</span>`;
           html += `
             <tr>
-              <td><strong style="color:white;">${b.name}</strong></td>
-              <td>${b.email || '<span style="color:var(--text-muted)">None</span>'}</td>
+              <td><strong style="color:white; font-size:0.95rem;">${escapeHtml(b.name)}</strong></td>
+              <td>${emailDisplay}</td>
+              <td style="color:#94a3b8;">${formatMoney(b.principal)}</td>
               <td style="font-family:var(--font-heading); font-weight:700; color:#fb7185;">${formatMoney(b.balance)}</td>
-              <td>${formatMoney(b.principal)}</td>
               <td>${getStatusBadge(b.status)}</td>
               <td>${renderInterestToggle(b.name, b.interestEnabled)}</td>
               <td>
                 <div style="display:flex; gap:6px; flex-wrap:wrap;">
                   <button class="action-btn-sm btn-edit" onclick="openBorrowerLedger('${escapeHtml(b.name)}')">📝 Ledger</button>
-                  <button class="action-btn-sm btn-edit" onclick="quickSendPasswordReset('${escapeHtml(b.email)}', '${escapeHtml(b.name)}')" title="Send 48h Password Reset Link" style="background:rgba(56,189,248,0.15); color:#7dd3fc; border-color:rgba(56,189,248,0.3);">🔑 Link</button>
+                  <button class="action-btn-sm btn-edit" onclick="quickSendPasswordReset('${escapeHtml(b.email || '')}', '${escapeHtml(b.name)}')" title="Send 48h Password Reset Link" style="background:rgba(56,189,248,0.15); color:#7dd3fc; border-color:rgba(56,189,248,0.3);">🔑 Link</button>
+                  <button class="action-btn-sm btn-edit" onclick="openDirectPasswordModal('${escapeHtml(b.email || '')}', '${escapeHtml(b.name)}')" title="Set Password Directly">✏️ Set Pw</button>
                   <button class="action-btn-sm btn-edit" onclick="confirmResetBorrowerLedger('${escapeHtml(b.name)}', ${b.principal || 0})" title="Reset Ledger to Starting Principal" style="background:rgba(239,68,68,0.15); color:#fca5a5; border-color:rgba(239,68,68,0.3);">🔄 Reset</button>
                   <button class="action-btn-sm btn-del" onclick="confirmDeleteBorrower('${escapeHtml(b.name)}', ${b.balance || 0})" title="Delete Borrower Account">🗑️</button>
                 </div>
@@ -2525,9 +2520,153 @@
         });
         tbody.innerHTML = html;
       } catch(e) {
-        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#fb7185; padding:20px;">Failed to load borrowers.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#fb7185; padding:20px;">Failed to load accounts.</td></tr>';
       }
     }
+
+    // Modal controls for Provisioning New Account
+    function openProvisionAccountModal() {
+      document.getElementById('adminInviteName').value = '';
+      document.getElementById('adminInviteEmail').value = '';
+      document.getElementById('adminInvitePrincipal').value = '';
+      const status = document.getElementById('adminInviteStatus');
+      if (status) status.style.display = 'none';
+      const btn = document.getElementById('btnAdminInvite');
+      if (btn) {
+        btn.disabled = false;
+        btn.innerText = '🚀 Provision & Send Link';
+      }
+      document.getElementById('provisionAccountModal').style.display = 'flex';
+      setTimeout(() => {
+        const nameInput = document.getElementById('adminInviteName');
+        if (nameInput) nameInput.focus();
+      }, 50);
+    }
+
+    function closeProvisionAccountModal() {
+      document.getElementById('provisionAccountModal').style.display = 'none';
+    }
+
+    async function handleAdminProvisionClient(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      const clientName = document.getElementById('adminInviteName').value.trim();
+      const email = document.getElementById('adminInviteEmail').value.trim();
+      const principal = document.getElementById('adminInvitePrincipal').value;
+      const btn = document.getElementById('btnAdminInvite');
+      const status = document.getElementById('adminInviteStatus');
+
+      if (!clientName) {
+        alert('Please enter client / borrower name.');
+        return;
+      }
+      if (!email) {
+        alert('Please enter client email address.');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerText = 'Provisioning account...';
+      status.style.display = 'none';
+
+      try {
+        const res = await fetchBankApi('admin_send_invite', { clientName: clientName, email: email, principal: principal });
+        btn.disabled = false;
+        btn.innerText = '🚀 Provision & Send Link';
+        status.style.display = 'block';
+
+        if (res && res.success) {
+          status.style.color = '#34d399';
+          status.innerText = `✅ Account provisioned & setup email sent to ${email}! Link expires in 48 hours.`;
+          document.getElementById('adminInviteName').value = '';
+          document.getElementById('adminInviteEmail').value = '';
+          document.getElementById('adminInvitePrincipal').value = '';
+          await loadAccountsDirectory();
+          await loadDashboard();
+          setTimeout(() => { closeProvisionAccountModal(); }, 1800);
+        } else {
+          status.style.color = '#fb7185';
+          status.innerText = `❌ ${res ? res.message : 'Error provisioning account.'}`;
+        }
+      } catch(err) {
+        btn.disabled = false;
+        btn.innerText = '🚀 Provision & Send Link';
+        status.style.display = 'block';
+        status.style.color = '#fb7185';
+        status.innerText = '❌ Failed to send invitation email.';
+      }
+    }
+
+    // Modal controls for Direct Password Override
+    function openDirectPasswordModal(email, name) {
+      document.getElementById('adminSetEmail').value = email || '';
+      document.getElementById('adminSetNewPw').value = '';
+      const status = document.getElementById('adminSetPwStatus');
+      if (status) status.style.display = 'none';
+      const btn = document.getElementById('btnAdminSetPw');
+      if (btn) {
+        btn.disabled = false;
+        btn.innerText = '🔑 Update Password';
+      }
+      document.getElementById('directPasswordModal').style.display = 'flex';
+      setTimeout(() => {
+        const pwInput = document.getElementById('adminSetNewPw');
+        if (pwInput) pwInput.focus();
+      }, 50);
+    }
+
+    function closeDirectPasswordModal() {
+      document.getElementById('directPasswordModal').style.display = 'none';
+    }
+
+    async function handleAdminDirectSetPassword(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      const email = document.getElementById('adminSetEmail').value.trim();
+      const newPassword = document.getElementById('adminSetNewPw').value;
+      const btn = document.getElementById('btnAdminSetPw');
+      const status = document.getElementById('adminSetPwStatus');
+
+      btn.disabled = true;
+      btn.innerText = 'Updating password...';
+      status.style.display = 'none';
+
+      try {
+        const res = await fetchBankApi('admin_set_password', { email: email, newPassword: newPassword });
+        btn.disabled = false;
+        btn.innerText = '🔑 Update Password';
+        status.style.display = 'block';
+
+        if (res && res.success) {
+          status.style.color = '#34d399';
+          status.innerText = `✅ Password updated for ${email}! Borrower can log in now.`;
+          document.getElementById('adminSetNewPw').value = '';
+          await loadAccountsDirectory();
+          setTimeout(() => { closeDirectPasswordModal(); }, 1600);
+        } else {
+          status.style.color = '#fb7185';
+          status.innerText = `❌ ${res ? res.message : 'Error setting password.'}`;
+        }
+      } catch(err) {
+        btn.disabled = false;
+        btn.innerText = '🔑 Update Password';
+        status.style.display = 'block';
+        status.style.color = '#fb7185';
+        status.innerText = '❌ Failed to connect to server.';
+      }
+    }
+
+    // Backward-compatible aliases
+    function loadBorrowersDirectory() { return loadAccountsDirectory(); }
+    function loadBorrowerAccountsList() { return loadAccountsDirectory(); }
+    function prefillSetPassword(email) { openDirectPasswordModal(email); }
+    function quickSetBorrowerPassword(email) { openDirectPasswordModal(email); }
+    function quickInviteBorrower(name, email, principal) {
+      openProvisionAccountModal();
+      document.getElementById('adminInviteName').value = name || '';
+      document.getElementById('adminInviteEmail').value = email || '';
+      document.getElementById('adminInvitePrincipal').value = principal || '';
+    }
+    const handleAdminSendInvite = handleAdminProvisionClient;
+    const handleAdminSetPassword = handleAdminDirectSetPassword;
 
     async function confirmDeleteBorrower(clientName, balance) {
       const balNum = parseFloat(balance) || 0;
@@ -2543,7 +2682,7 @@
         const res = await fetchBankApi('delete_borrower', { client: clientName });
         if (res && res.success) {
           alert(`✅ ${res.message || 'Borrower deleted successfully.'}`);
-          await loadBorrowersDirectory();
+          await loadAccountsDirectory();
           await loadDashboard();
         } else {
           alert(`❌ Deletion failed: ${res ? res.message : 'Unknown error'}`);
@@ -2555,16 +2694,18 @@
 
     function openBorrowerLedger(name) {
       const select = document.getElementById('ledgerClientSelect');
-      select.value = name;
-      const tabBtn = document.querySelectorAll('.admin-tab-btn')[2];
+      if (select) {
+        if (!Array.from(select.options).some(o => o.value === name)) {
+          const opt = document.createElement('option');
+          opt.value = name;
+          opt.innerText = name;
+          select.appendChild(opt);
+        }
+        select.value = name;
+      }
+      const tabBtn = document.getElementById('tabBtnLedger');
       switchAdminSection('ledger', tabBtn);
       loadDetailedLedger();
-    }
-
-    function prefillSetPassword(email) {
-      document.getElementById('adminSetEmail').value = email;
-      const tabBtn = document.querySelectorAll('.admin-tab-btn')[3];
-      switchAdminSection('accounts', tabBtn);
     }
 
     // --- 2. DETAILED LEDGER & TRANSACTION EDITOR ---
@@ -2735,181 +2876,7 @@
       }
     }
 
-    // --- 3. PASSWORDS & ACCOUNTS ---
-    async function loadBorrowerAccountsList() {
-      const tbody = document.getElementById('borrowerAccountsTableBody');
-      const select = document.getElementById('accountBorrowerSelect');
-      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:var(--text-muted);">Loading registered borrowers...</td></tr>';
-      
-      try {
-        const borrowers = cachedBorrowers.length ? cachedBorrowers : (await fetchBankApi('borrowers') || []);
-        cachedBorrowers = borrowers;
-        
-        // Populate select dropdown
-        select.innerHTML = '<option value="">-- Select a Borrower to Auto-Fill --</option>';
-        borrowers.forEach(b => {
-          const opt = document.createElement('option');
-          opt.value = b.name;
-          opt.innerText = `${b.name} (${b.email || 'No email'}) - Balance: ${formatMoney(b.balance)}`;
-          select.appendChild(opt);
-        });
 
-        if (borrowers.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:var(--text-muted);">No borrowers found in database.</td></tr>';
-          return;
-        }
-
-        let html = '';
-        borrowers.forEach(b => {
-          const emailDisplay = b.email ? `<span style="color:#cbd5e1;">${b.email}</span>` : `<span style="color:#fb7185; font-style:italic;">No Email Listed</span>`;
-          html += `
-            <tr>
-              <td><strong style="color:white; font-size:0.95rem;">${b.name}</strong></td>
-              <td>${emailDisplay}</td>
-              <td style="color:#94a3b8;">${formatMoney(b.principal)}</td>
-              <td style="font-family:var(--font-heading); font-weight:700; color:#fb7185;">${formatMoney(b.balance)}</td>
-              <td>${getStatusBadge(b.status)}</td>
-              <td>${renderInterestToggle(b.name, b.interestEnabled)}</td>
-              <td>
-                <div style="display:flex; gap:6px; flex-wrap:wrap;">
-                  <button class="action-btn-sm btn-edit" onclick="quickInviteBorrower('${b.name}', '${b.email || ''}', ${b.principal || 0})" style="background:rgba(168,85,247,0.2); color:#d8b4fe; border-color:rgba(168,85,247,0.4);">
-                    📧 1-Click Invite
-                  </button>
-                  <button class="action-btn-sm btn-edit" onclick="quickSendPasswordReset('${b.email || ''}', '${b.name}')" title="Send 48h Password Reset Link" style="background:rgba(56,189,248,0.15); color:#7dd3fc; border-color:rgba(56,189,248,0.3);">
-                    🔑 Link
-                  </button>
-                  <button class="action-btn-sm btn-edit" onclick="confirmResetBorrowerLedger('${b.name}', ${b.principal || 0})" title="Reset Ledger to Starting Principal" style="background:rgba(239,68,68,0.15); color:#fca5a5; border-color:rgba(239,68,68,0.3);">
-                    🔄 Reset
-                  </button>
-                  <button class="action-btn-sm btn-edit" onclick="quickSetBorrowerPassword('${b.email || ''}')">
-                    🔑 Set Pw
-                  </button>
-                </div>
-              </td>
-            </tr>
-          `;
-        });
-        tbody.innerHTML = html;
-      } catch(e) {
-        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#fb7185; padding:20px;">Failed to load borrowers from database.</td></tr>';
-      }
-    }
-
-    function onAccountBorrowerSelected(borrowerName) {
-      if (!borrowerName) return;
-      const borrower = cachedBorrowers.find(b => b.name === borrowerName);
-      if (borrower) {
-        document.getElementById('adminInviteName').value = borrower.name || '';
-        document.getElementById('adminInviteEmail').value = borrower.email || '';
-        document.getElementById('adminInvitePrincipal').value = borrower.principal || '';
-        if (borrower.email) {
-          document.getElementById('adminSetEmail').value = borrower.email;
-        }
-      }
-    }
-
-    function quickInviteBorrower(name, email, principal) {
-      if (!email) {
-        alert(`❌ Please provide an email address for ${name} in the form below first.`);
-        document.getElementById('accountBorrowerSelect').value = name;
-        onAccountBorrowerSelected(name);
-        document.getElementById('adminInviteEmail').focus();
-        return;
-      }
-
-      document.getElementById('accountBorrowerSelect').value = name;
-      onAccountBorrowerSelected(name);
-      
-      if (confirm(`📧 Dispatch official BDC Vault activation and password setup email to ${name} (${email})?`)) {
-        const fakeEvent = { preventDefault: () => {} };
-        handleAdminSendInvite(fakeEvent);
-      }
-    }
-
-    function quickSetBorrowerPassword(email) {
-      if (!email) {
-        alert(`❌ No email found for this borrower. Please enter their email below.`);
-        document.getElementById('adminSetEmail').focus();
-        return;
-      }
-      document.getElementById('adminSetEmail').value = email;
-      document.getElementById('adminSetNewPw').focus();
-      document.getElementById('adminSetNewPw').scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-
-    async function handleAdminSetPassword(e) {
-      e.preventDefault();
-      const email = document.getElementById('adminSetEmail').value.trim();
-      const newPassword = document.getElementById('adminSetNewPw').value;
-      const btn = document.getElementById('btnAdminSetPw');
-      const status = document.getElementById('adminSetPwStatus');
-
-      btn.disabled = true;
-      btn.innerText = 'Updating password...';
-      status.style.display = 'none';
-
-      try {
-        const res = await fetchBankApi('admin_set_password', { email: email, newPassword: newPassword });
-        btn.disabled = false;
-        btn.innerText = '🔑 Update Password in Database';
-        status.style.display = 'block';
-
-        if (res && res.success) {
-          status.style.color = '#34d399';
-          status.innerText = `✅ Password updated for ${email}! Borrower can log in now.`;
-          document.getElementById('adminSetNewPw').value = '';
-        } else {
-          status.style.color = '#fb7185';
-          status.innerText = `❌ ${res ? res.message : 'Error setting password.'}`;
-        }
-      } catch(err) {
-        btn.disabled = false;
-        btn.innerText = '🔑 Update Password in Database';
-        status.style.display = 'block';
-        status.style.color = '#fb7185';
-        status.innerText = '❌ Failed to connect to server.';
-      }
-    }
-
-    async function handleAdminSendInvite(e) {
-      e.preventDefault();
-      const clientName = document.getElementById('adminInviteName').value.trim();
-      const email = document.getElementById('adminInviteEmail').value.trim();
-      const principal = document.getElementById('adminInvitePrincipal').value;
-      const btn = document.getElementById('btnAdminInvite');
-      const status = document.getElementById('adminInviteStatus');
-
-      btn.disabled = true;
-      btn.innerText = 'Sending invitation email...';
-      status.style.display = 'none';
-
-      try {
-        const res = await fetchBankApi('admin_send_invite', { clientName: clientName, email: email, principal: principal });
-        btn.disabled = false;
-        btn.innerText = '📧 Dispatch Activation Email';
-        status.style.display = 'block';
-
-        if (res && res.success) {
-          status.style.color = '#34d399';
-          status.innerText = `✅ Account provisioned & setup email sent to ${email}! Link expires in 48 hours.`;
-          document.getElementById('adminInviteName').value = '';
-          document.getElementById('adminInviteEmail').value = '';
-          document.getElementById('adminInvitePrincipal').value = '';
-          loadBorrowerAccountsList();
-          loadBorrowersDirectory();
-          loadDashboard();
-        } else {
-          status.style.color = '#fb7185';
-          status.innerText = `❌ ${res ? res.message : 'Error sending invite.'}`;
-        }
-      } catch(err) {
-        btn.disabled = false;
-        btn.innerText = '📧 Dispatch Activation Email';
-        status.style.display = 'block';
-        status.style.color = '#fb7185';
-        status.innerText = '❌ Failed to send invitation email.';
-      }
-    }
 
     // --- 4. FINANCIAL ENGINES & BOT TRIGGERS ---
     async function triggerMonthlyInterestEngine(btn) {

@@ -31,6 +31,7 @@
 
 | Version | Release Date | Summary of Features & Fixes |
 | :--- | :--- | :--- |
+| **`v4.15.0`** | Oct 16, 2026 | Consolidated Borrowers and Passwords into unified Accounts directory. |
 | **`v4.14.0`** | Oct 15, 2026 | Added Instant Account Provisioning & Recurring Monthly Invoicing Engine. |
 | **`v4.13.0`** | Oct 14, 2026 | Added Client Payment Reporting & Executive 1-Click Verification Pipeline. |
 | **`v4.12.1`** | Oct 8, 2026 | Fixed duplicate GitHub Actions deployment failures on release tags. |

@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v4.15.0] - 2026-10-16
+### Added
+- Consolidated Borrowers and Passwords tabs into unified Accounts directory.
+- Eliminated redundant tables and vertical stacked forms.
+- Added sleek modal popups for provisioning new accounts.
+- Added direct password configuration modal with 1-click prefill.
+- Streamlined 1-click ledger deep links from directory table.
+- Reduced executive navigation to 7 clean, organized tabs.
+
 ## [v4.14.0] - 2026-10-15
 ### Added
 - Added instant account provisioning before user activation.
