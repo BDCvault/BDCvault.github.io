@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v4.14.0] - 2026-10-15
+### Added
+- Added instant account provisioning before user activation.
+- Built automated recurring monthly bills and invoicing scheduler.
+- Added Bill / Expense and Invoice / Charge types.
+- Added 1-click ledger reset to starting principal.
+- Added 1-click password reset link dispatcher.
+- Deployed Google Apps Script v79 with recurring engine.
+
 ## [v4.13.0] - 2026-10-14
 ### Added
 - Added Report Payment Sent button to client portal.

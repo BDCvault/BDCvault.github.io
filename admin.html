@@ -577,6 +577,9 @@
         <button class="admin-tab-btn" onclick="switchAdminSection('myloans', this)">
           💸 Loans I Owe
         </button>
+        <button class="admin-tab-btn" id="tabBtnRecurring" onclick="switchAdminSection('recurring', this)">
+          🔁 Recurring Bills
+        </button>
       </div>
 
       <!-- SECTION 1: OVERVIEW -->
@@ -805,6 +808,7 @@
             <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
               <select id="ledgerClientSelect" onchange="loadDetailedLedger()" style="padding:10px; background:#1e293b; color:white; border:1px solid var(--border-color); border-radius:10px; font-weight:600;"></select>
               <div id="ledgerInterestStatusBox" style="display:flex; align-items:center; gap:8px;"></div>
+              <button class="btn-primary" onclick="confirmResetCurrentLedger()" style="padding:10px 14px; font-size:0.85rem; background:rgba(239,68,68,0.2); color:#fca5a5; border:1px solid rgba(239,68,68,0.4);" title="Reset ledger to starting principal">🔄 Reset Ledger</button>
               <button class="btn-primary" onclick="toggleAddTxForm()" style="padding:10px 16px; font-size:0.85rem;">➕ Post New Tx</button>
             </div>
           </div>
@@ -823,6 +827,8 @@
                   <select id="newTxType">
                     <option value="Payment">Payment (- Balance)</option>
                     <option value="Loan">Loan (+ Balance)</option>
+                    <option value="Bill / Expense">Bill / Expense (+ Balance)</option>
+                    <option value="Invoice / Charge">Invoice / Charge (+ Balance)</option>
                     <option value="Interest">Interest (+ Balance)</option>
                     <option value="Fee">Fee (+ Balance)</option>
                   </select>
@@ -1130,6 +1136,48 @@
 
       </div>
 
+      <!-- SECTION 7: RECURRING MONTHLY INVOICES & BILLS -->
+      <div id="sectionRecurring" style="display:none;">
+        <div class="card" style="margin-bottom:20px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+            <div>
+              <h3 style="font-family:var(--font-heading); font-size:1.35rem; color:white; margin-bottom:4px; display:flex; align-items:center; gap:8px;">
+                🔁 Recurring Monthly Invoices & Bills
+                <span style="font-size:0.75rem; background:rgba(99,102,241,0.2); color:#a5b4fc; border:1px solid rgba(99,102,241,0.4); padding:3px 8px; border-radius:6px;">Auto-Scheduler</span>
+              </h3>
+              <p style="color:var(--text-muted); font-size:0.85rem; margin:0;">
+                Automate monthly recurring family bills (e.g. cable, phone, utilities). The engine automatically posts charges directly to borrower ledgers on their due day.
+              </p>
+            </div>
+            <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+              <button class="btn-primary" onclick="runAllDueRecurringBills()" style="padding:10px 16px; font-size:0.85rem; background:linear-gradient(135deg, #10b981, #059669);" title="Process any due monthly charges across all accounts">
+                ⚡ Run Due Bills Now
+              </button>
+              <button class="btn-primary" onclick="openAddRecurringModal()" style="padding:10px 16px; font-size:0.85rem; background:linear-gradient(135deg, #a855f7, #6366f1);">
+                ➕ New Recurring Bill
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- RECURRING BILLS LIST -->
+        <div id="recurringBillsGrid" class="myloans-grid">
+          <!-- Rendered dynamically -->
+        </div>
+
+        <!-- EMPTY STATE -->
+        <div id="recurringBillsEmpty" class="card" style="display:none; text-align:center; padding:48px 24px;">
+          <div style="font-size:3rem; margin-bottom:12px;">🗓️</div>
+          <h3 style="font-family:var(--font-heading); font-size:1.3rem; color:white; margin-bottom:8px;">No Recurring Bills Scheduled</h3>
+          <p style="color:var(--text-muted); font-size:0.88rem; max-width:440px; margin:0 auto 20px;">
+            Create monthly recurring charges for cable, phone, or utilities. They will be automatically posted to the client's ledger every month.
+          </p>
+          <button class="btn-primary" onclick="openAddRecurringModal()" style="padding:12px 24px; font-size:0.9rem;">
+            ➕ Schedule First Recurring Bill
+          </button>
+        </div>
+      </div>
+
     </div>
 
     <!-- EDIT TRANSACTION MODAL -->
@@ -1150,6 +1198,8 @@
             <select id="editType">
               <option value="Payment">Payment (- Balance)</option>
               <option value="Loan">Loan (+ Balance)</option>
+              <option value="Bill / Expense">Bill / Expense (+ Balance)</option>
+              <option value="Invoice / Charge">Invoice / Charge (+ Balance)</option>
               <option value="Interest">Interest (+ Balance)</option>
               <option value="Fee">Fee (+ Balance)</option>
             </select>
@@ -1312,6 +1362,62 @@
       </div>
     </div>
 
+    <!-- ADD / EDIT RECURRING BILL MODAL -->
+    <div id="recurringModal" class="modal-overlay" style="display:none;">
+      <div class="modal-box" style="max-width:540px;">
+        <h3 id="recurringModalTitle" style="font-family:var(--font-heading); color:white; margin-bottom:6px;">🔁 Schedule Recurring Bill</h3>
+        <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:18px;">
+          Configure automated monthly charges. A new transaction is logged to the client's ledger on the due day.
+        </p>
+        <form onsubmit="saveRecurringBillForm(event)">
+          <input type="hidden" id="recRuleId">
+          <div class="form-group" style="margin-bottom:12px;">
+            <label>Client / Account</label>
+            <select id="recClientSelect" required></select>
+          </div>
+          <div class="form-group" style="margin-bottom:12px;">
+            <label>Bill Title / Description</label>
+            <input type="text" id="recBillTitle" placeholder="e.g. Spectrum Cable Bill" required>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
+            <div class="form-group">
+              <label>Monthly Amount ($)</label>
+              <input type="number" step="0.01" id="recAmount" placeholder="e.g. 115.00" required>
+            </div>
+            <div class="form-group">
+              <label>Due Day of Month</label>
+              <input type="number" min="1" max="31" id="recDueDay" placeholder="e.g. 15" required>
+            </div>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
+            <div class="form-group">
+              <label>Category / Type</label>
+              <select id="recCategory">
+                <option value="Bill / Expense">Bill / Expense (+ Balance)</option>
+                <option value="Invoice / Charge">Invoice / Charge (+ Balance)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Status</label>
+              <select id="recStatus">
+                <option value="ACTIVE">ACTIVE</option>
+                <option value="PAUSED">PAUSED</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom:18px;">
+            <label>Notes (Optional)</label>
+            <input type="text" id="recNotes" placeholder="e.g. Account #12345, split 50/50">
+          </div>
+          <div style="display:flex; gap:10px;">
+            <button type="submit" id="btnSaveRecurring" class="btn-primary" style="flex:1;">Save Schedule ➔</button>
+            <button type="button" onclick="closeRecurringModal()" style="background:rgba(255,255,255,0.08); color:white; border:1px solid var(--border-color); padding:10px 18px; border-radius:12px; font-weight:600; cursor:pointer;">Cancel</button>
+          </div>
+          <div id="recModalStatus" style="text-align:center; margin-top:10px; font-weight:600; display:none;"></div>
+        </form>
+      </div>
+    </div>
+
     <footer>
       BDC Vault <span class="bdc-version-tag" style="color:#c084fc; font-weight:700; cursor:pointer;">v4.10.0</span> &bull; Executive Command Center
     </footer>
@@ -1336,6 +1442,7 @@
       document.getElementById('sectionAccounts').style.display = (section === 'accounts') ? 'block' : 'none';
       document.getElementById('sectionEmails').style.display = (section === 'emails') ? 'block' : 'none';
       document.getElementById('sectionMyLoans').style.display = (section === 'myloans') ? 'block' : 'none';
+      document.getElementById('sectionRecurring').style.display = (section === 'recurring') ? 'block' : 'none';
 
       if (section === 'applications') loadApplicationsList();
       if (section === 'borrowers') loadBorrowersDirectory();
@@ -1345,6 +1452,7 @@
       }
       if (section === 'accounts') loadBorrowerAccountsList();
       if (section === 'myloans') loadMyLoansSection();
+      if (section === 'recurring') loadRecurringInvoices();
     }
 
     function switchToApplicationsTab() {
@@ -2405,9 +2513,10 @@
               <td>${getStatusBadge(b.status)}</td>
               <td>${renderInterestToggle(b.name, b.interestEnabled)}</td>
               <td>
-                <div style="display:flex; gap:6px;">
+                <div style="display:flex; gap:6px; flex-wrap:wrap;">
                   <button class="action-btn-sm btn-edit" onclick="openBorrowerLedger('${escapeHtml(b.name)}')">📝 Ledger</button>
-                  <button class="action-btn-sm btn-edit" onclick="prefillSetPassword('${escapeHtml(b.email)}')">🔑 Pw</button>
+                  <button class="action-btn-sm btn-edit" onclick="quickSendPasswordReset('${escapeHtml(b.email)}', '${escapeHtml(b.name)}')" title="Send 48h Password Reset Link" style="background:rgba(56,189,248,0.15); color:#7dd3fc; border-color:rgba(56,189,248,0.3);">🔑 Link</button>
+                  <button class="action-btn-sm btn-edit" onclick="confirmResetBorrowerLedger('${escapeHtml(b.name)}', ${b.principal || 0})" title="Reset Ledger to Starting Principal" style="background:rgba(239,68,68,0.15); color:#fca5a5; border-color:rgba(239,68,68,0.3);">🔄 Reset</button>
                   <button class="action-btn-sm btn-del" onclick="confirmDeleteBorrower('${escapeHtml(b.name)}', ${b.balance || 0})" title="Delete Borrower Account">🗑️</button>
                 </div>
               </td>
@@ -2666,6 +2775,12 @@
                   <button class="action-btn-sm btn-edit" onclick="quickInviteBorrower('${b.name}', '${b.email || ''}', ${b.principal || 0})" style="background:rgba(168,85,247,0.2); color:#d8b4fe; border-color:rgba(168,85,247,0.4);">
                     📧 1-Click Invite
                   </button>
+                  <button class="action-btn-sm btn-edit" onclick="quickSendPasswordReset('${b.email || ''}', '${b.name}')" title="Send 48h Password Reset Link" style="background:rgba(56,189,248,0.15); color:#7dd3fc; border-color:rgba(56,189,248,0.3);">
+                    🔑 Link
+                  </button>
+                  <button class="action-btn-sm btn-edit" onclick="confirmResetBorrowerLedger('${b.name}', ${b.principal || 0})" title="Reset Ledger to Starting Principal" style="background:rgba(239,68,68,0.15); color:#fca5a5; border-color:rgba(239,68,68,0.3);">
+                    🔄 Reset
+                  </button>
                   <button class="action-btn-sm btn-edit" onclick="quickSetBorrowerPassword('${b.email || ''}')">
                     🔑 Set Pw
                   </button>
@@ -2776,8 +2891,13 @@
 
         if (res && res.success) {
           status.style.color = '#34d399';
-          status.innerText = `✅ Setup email sent to ${email}! Link expires in 48 hours.`;
+          status.innerText = `✅ Account provisioned & setup email sent to ${email}! Link expires in 48 hours.`;
+          document.getElementById('adminInviteName').value = '';
           document.getElementById('adminInviteEmail').value = '';
+          document.getElementById('adminInvitePrincipal').value = '';
+          loadBorrowerAccountsList();
+          loadBorrowersDirectory();
+          loadDashboard();
         } else {
           status.style.color = '#fb7185';
           status.innerText = `❌ ${res ? res.message : 'Error sending invite.'}`;
@@ -2991,6 +3111,251 @@
       // 4. Update Pending Badges and Alerts
       loadPaymentNoticesList();
       loadApplicationsList();
+    }
+
+    // --- 5. RECURRING BILLS & INVOICES ENGINE ---
+    let cachedRecurringRules = [];
+
+    async function loadRecurringInvoices() {
+      const container = document.getElementById('recurringBillsGrid');
+      const emptyState = document.getElementById('recurringBillsEmpty');
+      if (!container) return;
+
+      container.innerHTML = '<div style="color:var(--text-muted); text-align:center; padding:30px; grid-column:1/-1;">Loading recurring bill schedules...</div>';
+
+      const rules = await fetchBankApi('recurring_invoices') || [];
+      cachedRecurringRules = rules;
+      renderRecurringInvoices(rules);
+    }
+
+    function renderRecurringInvoices(rules) {
+      const container = document.getElementById('recurringBillsGrid');
+      const emptyState = document.getElementById('recurringBillsEmpty');
+      if (!container) return;
+
+      if (!rules || rules.length === 0) {
+        container.innerHTML = '';
+        if (emptyState) emptyState.style.display = 'block';
+        return;
+      }
+
+      if (emptyState) emptyState.style.display = 'none';
+
+      let html = '';
+      rules.forEach(r => {
+        const isPaused = (r.status || '').toUpperCase() === 'PAUSED';
+        const statusBadge = isPaused
+          ? `<span style="background:rgba(245,158,11,0.2); color:#fbbf24; border:1px solid rgba(245,158,11,0.4); padding:3px 8px; border-radius:6px; font-size:0.75rem; font-weight:700;">⏸️ PAUSED</span>`
+          : `<span style="background:rgba(16,185,129,0.2); color:#34d399; border:1px solid rgba(16,185,129,0.4); padding:3px 8px; border-radius:6px; font-size:0.75rem; font-weight:700;">⚡ ACTIVE</span>`;
+
+        html += `
+          <div class="myloan-card" style="border:1px solid ${isPaused ? 'rgba(245,158,11,0.3)' : 'rgba(168,85,247,0.3)'};">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
+              <div>
+                <div style="font-weight:700; color:white; font-size:1.15rem; margin-bottom:2px;">${escapeHtml(r.title)}</div>
+                <div style="color:var(--primary-purple); font-size:0.85rem; font-weight:600;">👤 ${escapeHtml(r.clientName)}</div>
+              </div>
+              ${statusBadge}
+            </div>
+
+            <div style="background:rgba(255,255,255,0.03); border-radius:12px; padding:12px; margin-bottom:14px; border:1px solid var(--border-color);">
+              <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                <span style="color:var(--text-muted); font-size:0.8rem;">Monthly Amount</span>
+                <strong style="color:#34d399; font-size:1.1rem;">$${formatMoney(r.amount).replace('$', '')}</strong>
+              </div>
+              <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                <span style="color:var(--text-muted); font-size:0.8rem;">Due Day</span>
+                <span style="color:white; font-size:0.85rem; font-weight:600;">Day ${r.dueDay} of each month</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                <span style="color:var(--text-muted); font-size:0.8rem;">Type</span>
+                <span style="color:#c084fc; font-size:0.8rem;">${escapeHtml(r.category || 'Bill / Expense')}</span>
+              </div>
+              <div style="display:flex; justify-content:space-between;">
+                <span style="color:var(--text-muted); font-size:0.8rem;">Last Billed</span>
+                <span style="color:${r.lastBilledDate ? '#93c5fd' : 'var(--text-muted)'}; font-size:0.8rem;">${r.lastBilledDate || 'Not billed yet'}</span>
+              </div>
+            </div>
+
+            ${r.notes ? `<div style="font-size:0.8rem; color:var(--text-muted); font-style:italic; margin-bottom:14px;">"${escapeHtml(r.notes)}"</div>` : ''}
+
+            <div style="display:flex; gap:8px; justify-content:space-between;">
+              <button class="action-btn-sm btn-primary" onclick="billNowRecurringRule('${r.id}', '${escapeHtml(r.clientName)}', ${r.amount})" style="padding:7px 12px; font-size:0.8rem; background:linear-gradient(135deg, #10b981, #059669);">
+                ⚡ Bill Now
+              </button>
+              <div style="display:flex; gap:6px;">
+                <button class="action-btn-sm btn-edit" onclick="toggleRecurringRule('${r.id}', '${r.status}')" style="padding:7px 10px; font-size:0.8rem;">
+                  ${isPaused ? '▶️ Resume' : '⏸️ Pause'}
+                </button>
+                <button class="action-btn-sm btn-del" onclick="deleteRecurringRule('${r.id}', '${escapeHtml(r.title)}')" style="padding:7px 10px; font-size:0.8rem;">
+                  🗑️
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+    }
+
+    function openAddRecurringModal() {
+      document.getElementById('recRuleId').value = '';
+      document.getElementById('recBillTitle').value = '';
+      document.getElementById('recAmount').value = '';
+      document.getElementById('recDueDay').value = '15';
+      document.getElementById('recCategory').value = 'Bill / Expense';
+      document.getElementById('recStatus').value = 'ACTIVE';
+      document.getElementById('recNotes').value = '';
+      document.getElementById('recModalStatus').style.display = 'none';
+
+      const select = document.getElementById('recClientSelect');
+      select.innerHTML = '';
+      const clientNames = (cachedBorrowers && cachedBorrowers.length > 0)
+        ? cachedBorrowers.map(b => b.name)
+        : (window.cachedClientsList || []);
+      
+      if (clientNames.length === 0) {
+        const opt = document.createElement('option');
+        opt.value = '';
+        opt.innerText = 'No accounts found';
+        select.appendChild(opt);
+      } else {
+        clientNames.forEach(name => {
+          const opt = document.createElement('option');
+          opt.value = name;
+          opt.innerText = name;
+          select.appendChild(opt);
+        });
+      }
+
+      document.getElementById('recurringModal').style.display = 'flex';
+    }
+
+    function closeRecurringModal() {
+      document.getElementById('recurringModal').style.display = 'none';
+    }
+
+    async function saveRecurringBillForm(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btnSaveRecurring');
+      const status = document.getElementById('recModalStatus');
+      btn.disabled = true;
+      btn.innerText = 'Saving schedule...';
+      status.style.display = 'none';
+
+      const clientName = document.getElementById('recClientSelect').value;
+      const title = document.getElementById('recBillTitle').value.trim();
+      const amount = document.getElementById('recAmount').value;
+      const dueDay = document.getElementById('recDueDay').value;
+      const category = document.getElementById('recCategory').value;
+      const ruleStatus = document.getElementById('recStatus').value;
+      const notes = document.getElementById('recNotes').value.trim();
+      const id = document.getElementById('recRuleId').value;
+
+      const res = await fetchBankApi('save_recurring_invoice', {
+        id: id,
+        clientName: clientName,
+        title: title,
+        amount: amount,
+        dueDay: dueDay,
+        category: category,
+        status: ruleStatus,
+        notes: notes
+      });
+
+      btn.disabled = false;
+      btn.innerText = 'Save Schedule ➔';
+
+      if (res && res.success) {
+        closeRecurringModal();
+        loadRecurringInvoices();
+      } else {
+        status.style.display = 'block';
+        status.style.color = '#f87171';
+        status.innerText = '⚠️ ' + (res ? res.message : 'Error saving recurring bill.');
+      }
+    }
+
+    async function toggleRecurringRule(id, currentStatus) {
+      const isCurrentlyActive = (currentStatus || '').toUpperCase() === 'ACTIVE';
+      const newActive = !isCurrentlyActive;
+      await fetchBankApi('toggle_recurring_invoice', { id: id, active: newActive });
+      loadRecurringInvoices();
+    }
+
+    async function deleteRecurringRule(id, title) {
+      if (!confirm(`Are you sure you want to delete recurring bill rule "${title}"?`)) return;
+      await fetchBankApi('delete_recurring_invoice', { id: id });
+      loadRecurringInvoices();
+    }
+
+    async function billNowRecurringRule(id, client, amount) {
+      if (!confirm(`⚡ Post $${formatMoney(amount).replace('$', '')} to ${client}'s ledger right now? This will immediately update their running balance and send their invoice notification email.`)) return;
+      const res = await fetchBankApi('trigger_recurring_invoice', { id: id });
+      if (res && res.success) {
+        alert(`✅ ${res.message}`);
+        loadRecurringInvoices();
+      } else {
+        alert(`❌ ${res ? res.message : 'Error executing charge.'}`);
+      }
+    }
+
+    async function runAllDueRecurringBills() {
+      if (!confirm('Run all due monthly recurring bills right now? Any ACTIVE bill where today >= due day and not yet billed this month will be posted to the ledger.')) return;
+      const res = await fetchBankApi('run_due_recurring_invoices');
+      if (res && res.success) {
+        alert(`✅ ${res.message}\n${(res.billedItems || []).join('\n') || 'All accounts already up to date for this month.'}`);
+        loadRecurringInvoices();
+      } else {
+        alert(`❌ ${res ? res.message : 'Error running recurring engine.'}`);
+      }
+    }
+
+    async function confirmResetBorrowerLedger(clientName, startingPrincipal) {
+      const pStr = formatMoney(startingPrincipal);
+      if (!confirm(`⚠️ RESET ACCOUNT LEDGER FOR "${clientName}"?\n\nThis will:\n1. Delete all transactions from their ledger sheet tab.\n2. Restore their balance to their starting principal (${pStr}).\n3. Recalculate and synchronize the Master Dashboard CRM.\n\nAre you sure you want to proceed?`)) {
+        return;
+      }
+
+      const res = await fetchBankApi('reset_borrower_ledger', { client: clientName });
+      if (res && res.success) {
+        alert(`✅ ${res.message}`);
+        loadBorrowersDirectory();
+        loadDashboard();
+        if (document.getElementById('ledgerClientSelect').value === clientName) {
+          loadDetailedLedger();
+        }
+      } else {
+        alert(`❌ Reset failed: ${res ? res.message : 'Unknown error'}`);
+      }
+    }
+
+    function confirmResetCurrentLedger() {
+      const client = document.getElementById('ledgerClientSelect').value;
+      if (!client) {
+        alert('Please select a borrower first.');
+        return;
+      }
+      const bMatch = cachedBorrowers.find(x => x.name === client);
+      confirmResetBorrowerLedger(client, bMatch ? (bMatch.principal || 0) : 0);
+    }
+
+    async function quickSendPasswordReset(email, clientName) {
+      if (!email || !email.includes('@')) {
+        alert('Borrower has no valid email address on file.');
+        return;
+      }
+      if (!confirm(`🔑 Dispatch a fresh 48-hour password reset link to ${clientName} (${email})?`)) {
+        return;
+      }
+
+      const res = await fetchBankApi('admin_send_password_reset', { email: email });
+      if (res && res.success) {
+        alert(`✅ ${res.message}`);
+      } else {
+        alert(`❌ ${res ? res.message : 'Error sending password reset link.'}`);
+      }
     }
   </script>
 </body>

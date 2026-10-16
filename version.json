@@ -1,9 +1,10 @@
 {
-  "version": "4.13.0",
-  "releaseDate": "October 14, 2026",
+  "version": "4.14.0",
+  "releaseDate": "October 15, 2026",
   "notes": [
-    "Added Report Payment Sent action to borrower portal.",
-    "Built Executive Pending Payment Verifications inbox with 1-click approvals.",
-    "Automated balance deduction and instant borrower payment receipts."
+    "Added instant account provisioning before user activation.",
+    "Built automated recurring monthly bills and invoicing engine.",
+    "Added Bill and Invoice transaction types to ledger.",
+    "Added 1-click ledger reset and password reset links."
   ]
 }

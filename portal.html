@@ -30,7 +30,7 @@
     }
     .tx-item:last-child { border-bottom: none; }
     .tx-amount.Payment { color: #34d399; }
-    .tx-amount.Loan, .tx-amount.Interest, .tx-amount.Fee { color: #fb7185; }
+    .tx-amount.Loan, .tx-amount.Interest, .tx-amount.Fee, .tx-amount.Bill, .tx-amount.Invoice, .tx-amount.tx-charge { color: #fb7185; }
     .btn-signout {
       background: rgba(239, 68, 68, 0.12);
       border: 1px solid rgba(239, 68, 68, 0.3);
@@ -353,17 +353,28 @@
       const txContainer = document.getElementById('txList');
       let html = '';
       [...ledger].reverse().forEach(tx => {
-        const type = tx[1];
+        const type = String(tx[1] || 'Loan');
         const desc = tx[2];
         const amt = parseFloat(tx[3]) || 0;
-        const displayAmt = (type === 'Payment' || amt < 0) ? `-${formatMoney(amt)}` : `+${formatMoney(amt)}`;
+        const isPayment = (type === 'Payment' || amt < 0);
+        const displayAmt = isPayment ? `-${formatMoney(amt)}` : `+${formatMoney(amt)}`;
+        const txClass = isPayment ? 'Payment' : 'tx-charge';
+
+        let typeBadge = type;
+        if (type.includes('Bill')) typeBadge = '📄 ' + type;
+        else if (type.includes('Invoice')) typeBadge = '🧾 ' + type;
+        else if (type === 'Payment') typeBadge = '💸 Payment';
+        else if (type === 'Loan') typeBadge = '💎 Loan';
+        else if (type === 'Interest') typeBadge = '📈 Interest';
+        else if (type === 'Fee') typeBadge = '⚠️ Fee';
+
         html += `
           <div class="tx-item">
             <div>
               <div style="font-weight:600; color:white;">${desc}</div>
-              <div style="font-size:0.78rem; color:var(--text-muted); margin-top:2px;">${tx[0]} &bull; ${type}</div>
+              <div style="font-size:0.78rem; color:var(--text-muted); margin-top:2px;">${tx[0]} &bull; ${typeBadge}</div>
             </div>
-            <div class="tx-amount ${type}" style="font-family:var(--font-heading); font-weight:700; font-size:1.1rem;">${displayAmt}</div>
+            <div class="tx-amount ${txClass}" style="font-family:var(--font-heading); font-weight:700; font-size:1.1rem;">${displayAmt}</div>
           </div>
         `;
       });
