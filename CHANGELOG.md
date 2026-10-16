@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v4.16.0] - 2026-10-16
+### Added
+- Added automated cloud trigger on 1st of month.
+- Recurring bills post hands-free at 1:00 AM.
+- Gives borrowers a 10-day window to pay.
+- Added live cloud trigger status badge to dashboard.
+- Clarified manual button is for instant testing only.
+- Deployed Apps Script v80 with automated trigger endpoints.
+
 ## [v4.15.0] - 2026-10-16
 ### Added
 - Consolidated Borrowers and Passwords tabs into unified Accounts directory.

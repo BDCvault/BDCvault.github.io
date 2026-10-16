@@ -1,10 +1,10 @@
 {
-  "version": "4.15.0",
+  "version": "4.16.0",
   "releaseDate": "October 16, 2026",
   "notes": [
-    "Consolidated Borrowers and Passwords into unified Accounts directory.",
-    "Eliminated redundant tables and vertical stacked forms.",
-    "Added sleek modal popups for provisioning new accounts.",
-    "Added direct password configuration modal with 1-click prefill."
+    "Added automated cloud trigger on 1st of month.",
+    "Recurring bills post hands-free at 1:00 AM.",
+    "Ensures borrowers have 10-day window to pay.",
+    "Added automated cloud trigger status badge."
   ]
 }
