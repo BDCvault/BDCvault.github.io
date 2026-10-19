@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v4.18.0] - 2026-10-19
+### Changed
+- Restored Cash App payment link directly to BrianDivaCox.
+- Restored client portal payment button to $BrianDivaCox.
+- Restored payment reporting dropdown to $BrianDivaCox.
+- Restored admin payment modal to Cash App ($BrianDivaCox).
+- Restored statement and receipt email template footers.
+- Deployed Google Apps Script v82 with updated endpoints.
+
 ## [v4.17.0] - 2026-10-16
 ### Changed
 - Updated Cash App settlement handle to Tyeesylvester.
